@@ -1,0 +1,198 @@
+saya ingin membuat aplikasi pengelolaan E-Modul Praktikum menggunakan Codeigniter. terdiri dari role kepala lab(admin), asisten dosen/laboran, dan mahasiswa. output dari aplikasi ini adalah kebebasan mahasiswa untuk mengkakses E-modul kapan saja melaui smartphone/PC/Laptop per pertemuan. Mahasiswa bisa mengakses kembali kapan saja modul di semester sebelumnya, namun belum bisa mengakses modul di semester depan.
+
+
+1. Planning
+
+Aplikasi E-Modul Praktikum dirancang sebagai sistem berbasis web responsif menggunakan CodeIgniter yang memungkinkan pengelolaan, distribusi, dan akses modul praktikum secara terstruktur per pertemuan. Sistem ini mendukung multi-role user (Kepala Lab/Admin, Asisten Dosen/Laboran, dan Mahasiswa) dengan hak akses berbeda.
+
+Tujuan utama aplikasi:
+
+* Mempermudah distribusi E-Modul Praktikum
+* Menjamin keteraturan modul per pertemuan
+* Memberikan kebebasan akses bagi mahasiswa kapan saja dan di berbagai perangkat
+* Menjaga aturan akademik terkait akses semester
+
+---
+ 2. Problem
+
+Permasalahan yang melatarbelakangi pengembangan aplikasi ini antara lain:
+
+1. Modul praktikum masih tersebar (file lokal, grup chat, email).
+2. Tidak ada pengelompokan modul berdasarkan pertemuan.
+3. Tidak ada pembatasan akses modul berdasarkan semester aktif.
+
+
+---
+
+## 3. App Flow (Alur Aplikasi)
+
+Alur Umum:
+
+1. User membuka aplikasi melalui browser (HP/PC/Laptop)
+2. Login sesuai role
+3. Sistem menampilkan dashboard sesuai hak akses
+4. User berinteraksi dengan modul sesuai kewenangan
+
+Alur Mahasiswa:
+
+* Login
+* Memilih semester aktif / semester sebelumnya
+* Memilih mata kuliah praktikum
+* Melihat daftar pertemuan (Pertemuan 1, 2, 3, dst.)
+* Mengakses E-Modul (PDF, video, link, dll.)
+
+> Tidak dapat mengakses modul semester yang belum berlangsung
+
+---
+
+## 4. Core Features
+
+Umum
+
+* Authentication & Authorization (RBAC)
+* Akses lintas perangkat (responsive)
+* Pengelolaan modul per pertemuan
+* Pembatasan akses berbasis semester
+
+Admin (Kepala Lab)
+
+* Kelola user (laboran & mahasiswa)
+* Kelola semester (aktif / nonaktif)
+* Monitoring aktivitas modul
+* Kelola mata kuliah & praktikum
+
+Asisten Dosen / Laboran
+
+* Upload E-Modul per pertemuan
+* Edit & hapus modul
+* Menentukan semester modul
+* Mengatur visibilitas modul
+
+Mahasiswa
+
+* Akses modul semester aktif & sebelumnya
+* Navigasi modul per pertemuan
+* Download / baca modul kapan saja
+
+---
+
+## 5. Frontend
+
+UI (User Interface)
+
+* Responsive design (Bootstrap/Tailwind)
+* Clean & akademik
+* Icon dan warna berbeda per role
+* Tampilan modular (card-based)
+
+Halaman Utama:
+
+* Login
+* Dashboard
+* Daftar Praktikum
+* Daftar Pertemuan
+* Detail Modul
+
+---
+
+## 6. Navigation
+
+Mahasiswa
+
+* Dashboard
+* Semester
+* Mata Kuliah Praktikum
+* Pertemuan
+* Modul
+
+Laboran
+
+* Dashboard
+* Kelola Modul
+* Kelola Pertemuan
+* Riwayat Upload
+
+Admin
+
+* Dashboard
+* User Management
+* Semester Management
+* Monitoring Modul
+
+---
+
+7. Backend
+
+Framework
+
+* CodeIgniter 3 atau 4 (disarankan CI4)
+* MVC Architecture
+* Session-based authentication
+
+Logic Utama:
+
+* Role-based access control
+* Validasi semester aktif
+* Filter modul berdasarkan semester & pertemuan
+* Logging aktivitas user
+
+---
+
+## 8. Database (Contoh awal, modifikasi tabel bila perlu)
+
+Tabel Users
+
+* id_user
+* nama
+* role (admin/laboran/mahasiswa)
+* semester_aktif
+
+### Tabel Semester
+
+* id_semester
+* nama_semester
+* status (aktif/tidak)
+
+### Tabel Mata Kuliah
+
+* id_matkul
+* nama_matkul
+
+### Tabel Pertemuan
+
+* id_pertemuan
+* id_matkul
+* pertemuan_ke
+
+### Tabel Modul
+
+* id_modul
+* id_pertemuan
+* id_semester
+* judul_modul
+* file_modul
+* tanggal_upload
+
+---
+
+## 9. API Endpoints (contoh, tolong buat yang lebih baik)
+
+### Auth
+
+* POST `/login`
+* POST `/logout`
+
+### Modul
+
+* GET `/modul/{semester}`
+* GET `/modul/pertemuan/{id}`
+* POST `/modul/upload`
+* DELETE `/modul/{id}`
+
+### Semester
+
+* GET `/semester/aktif`
+* GET `/semester/riwayat`
+
+---
+
