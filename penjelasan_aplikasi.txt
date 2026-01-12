@@ -1,0 +1,90 @@
+=====================================================
+PENJELASAN APLIKASI E-MODUL PRAKTIKUM
+=====================================================
+
+1. DESKRIPSI SINGKAT
+-------------------
+E-Modul Praktikum adalah platform manajemen materi praktikum digital yang memungkinkan mahasiswa mengakses modul secara fleksibel di berbagai perangkat. Aplikasi ini dirancang untuk memudahkan distribusi materi dari Laboran kepada Mahasiswa dengan pengawasan penuh dari Kepala Lab (Admin).
+
+2. TEKNOLOGI YANG DIGUNAKAN
+--------------------------
+- Backend: PHP dengan Framework CodeIgniter 3
+- Frontend: Tailwind CSS (Custom Theme: Google Classroom Style)
+- Database: MySQL
+- Library: Material Icons, Google Fonts (Roboto)
+
+3. FITUR UTAMA BERDASARKAN ROLE
+------------------------------
+A. ADMIN (KEPALA LAB)
+   - Manajemen User: Menambah, mengedit, atau menonaktifkan akun Laboran dan Mahasiswa.
+   - Manajemen Semester: Mengontrol periode akademik aktif.
+   - Manajemen Mata Kuliah: Membuat dan mengelola daftar praktikum.
+   - Audit Log: Memantau riwayat aktivitas semua pengguna di sistem.
+
+B. LABORAN (ASISTEN DOSEN)
+   - Manajemen Pertemuan: Membuat jadwal pertemuan per mata kuliah.
+   - Upload Modul: Mendukung berbagai tipe file (PDF, Video, Link External).
+   - Visibility Control: Fitur untuk menyembunyikan/menampilkan modul (Draft vs Publish).
+   - Dashboard Statistik: Melihat jumlah download/akses per modul.
+
+C. MAHASISWA
+   - Dashboard Modern: Tampilan bersih menyerupai Google Classroom.
+   - Akses Fleksibel: Browsing materi berdasarkan semester (aktif maupun riwayat).
+   - Pembatasan Semester: Keamanan akses materi berdasarkan aturan tanggal mulai praktikum.
+   - Download & Preview: Fitur melihat PDF langsung di browser atau mengunduhnya.
+
+4. KEUNGGULAN SISTEM
+-------------------
+- User Interface (UI): Minimalis, modern, dan sangat intuitif bagi pengguna yang terbiasa dengan ekosistem Google.
+- Responsive Design: Optimal dibuka melalui Smartphone, Tablet, maupun Laptop.
+- RBAC (Role Based Access Control): Keamanan sistem yang memastikan setiap pengguna hanya mengakses fitur sesuai wewenangnya.
+- Centralized Data: Semua file terdokumentasi rapi dalam satu server, mencegah kehilangan materi praktikum dari tahun ke tahun.
+
+=====================================================
+Terima Kasih
+
+=====================================================
+5. WORKFLOW APLIKASI
+-------------------
+Sistem bekerja dengan urutan kolaborasi sebagai berikut:
+
+STEP 1: PERSIAPAN (ADMIN)
+- Admin login dan memastikan Semester aktif sudah diset.
+- Admin mendaftarkan akun Laboran dan Mahasiswa.
+- Admin membuat daftar Mata Kuliah yang akan dipraktikumkan.
+
+STEP 2: MANAJEMEN MATERI (LABORAN)
+- Laboran login dan melihat daftar Mata Kuliah yang menjadi tanggung jawabnya.
+- Laboran membuat jadwal "Pertemuan" (misal: Pertemuan 1 s/d 14).
+- Laboran mengunggah berkas Modul (PDF/Video/Link) ke setiap pertemuan.
+- Laboran mengaktifkan (Publish) modul agar bisa dilihat mahasiswa.
+
+STEP 3: AKSES BELAJAR (MAHASISWA)
+- Mahasiswa login dan masuk ke Dashboard.
+- Mahasiswa memilih Semester yang sedang ditempuh.
+- Mahasiswa memilih Mata Kuliah Praktikum.
+- Mahasiswa melihat daftar Pertemuan dan mengakses/mendownload modul untuk belajar.
+
+STEP 4: MONITORING (ADMIN)
+- Admin secara berkala memantau Log Aktivitas untuk memastikan penggunaan sistem berjalan lancar dan aman.
+
+=====================================================
+6. FLOW DATA (DATABASE PROCESS)
+=====================================================
+Aplikasi ini menggunakan pola MVC (Model-View-Controller) untuk menangani data:
+
+A. FLOW PENGAMBILAN DATA (READ)
+1. Browser mengirim HTTP Request (Contoh: Buka daftar modul).
+2. CONTROLLER menerima request dan memanggil fungsi di MODEL.
+3. MODEL melakukan query SELECT ke database menggunakan Query Builder (CI_DB).
+4. Database mengembalikan DATA ke Model, lalu Model meneruskannya ke Controller.
+5. CONTROLLER mengirim data tersebut ke VIEW (HTML).
+6. Browser menampilkan data yang sudah diproses.
+
+B. FLOW PENYIMPANAN DATA (CREATE/UPDATE/DELETE)
+1. Browser mengirim data dari FORM (Contoh: Update Profil/Upload Modul).
+2. CONTROLLER menangkap data POST dan melakukan validasi (Filter XSS/Security).
+3. Jika data valid, CONTROLLER mengirim data tersebut ke MODEL.
+4. MODEL menjalankan perintah INSERT/UPDATE/DELETE ke database.
+5. Controller memberikan feedback (FLASH MESSAGE) sukses/gagal.
+6. Arahkan user (REDIRECT) kembali ke halaman utama.

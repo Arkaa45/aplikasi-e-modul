@@ -79,7 +79,7 @@
             </a>
             <a href="<?= base_url('admin/semester/create') ?>"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
-                <span class="material-icons-outlined text-gray-500">calendar_add_on</span>
+                <span class="material-icons-outlined text-gray-500">edit_calendar</span>
                 <span class="text-sm text-gray-700">Tambah Semester</span>
             </a>
             <a href="<?= base_url('admin/matkul/create') ?>"
