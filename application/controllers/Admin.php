@@ -127,6 +127,9 @@ class Admin extends Admin_Controller
             case 'activate':
                 $this->semester_activate($id);
                 break;
+            case 'courses':
+                $this->semester_courses($id);
+                break;
             default:
                 $this->semester_list();
         }
@@ -157,13 +160,13 @@ class Admin extends Admin_Controller
                 $this->Semester_model->update($id, $semester_data);
                 $this->log_activity('update_semester', 'Updated semester');
                 $this->session->set_flashdata('success', 'Semester berhasil diperbarui');
+                redirect('admin/semester');
             } else {
-                $this->Semester_model->create($semester_data);
+                $new_id = $this->Semester_model->create($semester_data);
                 $this->log_activity('create_semester', 'Created new semester');
-                $this->session->set_flashdata('success', 'Semester berhasil ditambahkan');
+                $this->session->set_flashdata('success', 'Semester berhasil ditambahkan. Silakan tambahkan mata kuliah praktikum.');
+                redirect('admin/semester/courses/' . $new_id);
             }
-
-            redirect('admin/semester');
         }
 
         $data = array(
@@ -190,6 +193,40 @@ class Admin extends Admin_Controller
         $this->log_activity('activate_semester', 'Activated semester ID: ' . $id);
         $this->session->set_flashdata('success', 'Semester berhasil diaktifkan');
         redirect('admin/semester');
+    }
+
+    private function semester_courses($id)
+    {
+        $semester = $this->Semester_model->get_by_id($id);
+        if (!$semester) {
+            $this->session->set_flashdata('error', 'Semester tidak ditemukan');
+            redirect('admin/semester');
+        }
+
+        // Handle form submission to add mata kuliah
+        if ($this->input->post()) {
+            $matkul_data = array(
+                'kode_matkul' => $this->input->post('kode_matkul', TRUE),
+                'nama_matkul' => $this->input->post('nama_matkul', TRUE),
+                'sks' => $this->input->post('sks', TRUE),
+                'deskripsi' => $this->input->post('deskripsi', TRUE),
+                'is_active' => 1
+            );
+
+            $this->Matkul_model->create($matkul_data);
+            $this->log_activity('create_matkul', 'Created mata kuliah: ' . $matkul_data['nama_matkul']);
+            $this->session->set_flashdata('success', 'Mata kuliah berhasil ditambahkan. Tambahkan lagi atau selesai.');
+            redirect('admin/semester/courses/' . $id);
+        }
+
+        $data = array(
+            'title' => 'Tambah Mata Kuliah untuk Semester',
+            'page_title' => 'Mata Kuliah - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
+            'semester' => $semester,
+            'matkuls' => $this->Matkul_model->get_all()
+        );
+
+        $this->load_view('admin/semester/courses', $data);
     }
 
     /**
