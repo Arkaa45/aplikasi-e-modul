@@ -9,29 +9,29 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- My Mata Kuliah -->
+    <!-- My Mata Praktikum -->
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-100">
             <h2 class="font-medium text-gray-800 flex items-center gap-2">
                 <span class="material-icons-outlined text-lg">menu_book</span>
-                Mata Kuliah Saya
+                Mata Praktikum Saya
             </h2>
         </div>
         <div class="p-5">
-            <?php if (!empty($my_matkul)): ?>
+            <?php if (!empty($my_matkum)): ?>
                 <div class="space-y-3">
-                    <?php foreach ($my_matkul as $matkul): ?>
-                        <a href="<?= base_url('laboran/modul?matkul=' . $matkul->id) ?>"
+                    <?php foreach ($my_matkum as $matkum): ?>
+                        <a href="<?= base_url('laboran/modul?matkum=' . $matkum->id) ?>"
                             class="block p-4 rounded-lg border border-gray-200 hover:border-brown-300 hover:bg-cream-50 transition">
-                            <p class="font-medium text-gray-800"><?= htmlspecialchars($matkul->nama_matkul) ?></p>
-                            <p class="text-sm text-gray-500"><?= $matkul->kode_matkul ?></p>
+                            <p class="font-medium text-gray-800"><?= htmlspecialchars($matkum->nama_matkul) ?></p>
+                            <p class="text-sm text-gray-500"><?= $matkum->kode_matkul ?></p>
                         </a>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
                 <div class="text-center py-8">
                     <span class="material-icons-outlined text-5xl text-gray-300 mb-3">menu_book</span>
-                    <p class="text-gray-500">Belum ditugaskan ke mata kuliah</p>
+                    <p class="text-gray-500">Belum ditugaskan ke mata praktikum</p>
                 </div>
             <?php endif; ?>
         </div>
@@ -64,7 +64,8 @@
                             <span class="material-icons-outlined text-gray-400">description</span>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-700 truncate">
-                                    <?= htmlspecialchars($modul->judul_modul) ?></p>
+                                    <?= htmlspecialchars($modul->judul_modul) ?>
+                                </p>
                                 <p class="text-xs text-gray-500">Pertemuan <?= $modul->pertemuan_ke ?></p>
                             </div>
                             <a href="<?= base_url('laboran/modul/edit/' . $modul->id) ?>"

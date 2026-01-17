@@ -4,7 +4,7 @@
     <p class="text-sm text-gray-500">
         <a href="<?= base_url('dashboard') ?>" class="hover:text-brown-500">Dashboard</a>
         <span class="mx-2">/</span>
-        <a href="<?= base_url('mahasiswa/matkul/' . $semester->id) ?>" class="hover:text-brown-500">Mata Kuliah</a>
+        <a href="<?= base_url('mahasiswa/matkum/' . $semester->id) ?>" class="hover:text-brown-500">Mata Praktikum</a>
         <span class="mx-2">/</span>
         <span>Pertemuan</span>
     </p>
@@ -17,7 +17,8 @@
         <div>
             <h2 class="text-lg font-medium"><?= htmlspecialchars($matkul->nama_matkul) ?></h2>
             <p class="text-sm opacity-80"><?= $matkul->kode_matkul ?> • <?= $semester->nama_semester ?>
-                <?= $semester->tahun_ajaran ?></p>
+                <?= $semester->tahun_ajaran ?>
+            </p>
         </div>
     </div>
 </div>
@@ -53,7 +54,7 @@
         <div class="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center">
             <span class="material-icons-outlined text-5xl text-gray-300 mb-3">event</span>
             <p class="text-gray-500">Belum ada pertemuan</p>
-            <a href="<?= base_url('mahasiswa/matkul/' . $semester->id) ?>"
+            <a href="<?= base_url('mahasiswa/matkum/' . $semester->id) ?>"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 text-white rounded-lg mt-4">
                 <span class="material-icons-outlined text-lg">arrow_back</span>
                 Kembali

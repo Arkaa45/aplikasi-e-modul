@@ -8,9 +8,7 @@
         <span class="mx-2">/</span>
         <a href="<?= base_url('laboran/finish_upload') ?>" class="hover:text-brown-500">Upload Modul</a>
         <span class="mx-2">/</span>
-        <span>
-            <?= htmlspecialchars($selected_matkul->nama_matkul) ?>
-        </span>
+            <?= htmlspecialchars($selected_matkum->nama_matkul) ?>
     </p>
 </div>
 
@@ -24,22 +22,21 @@
     <!-- Matkul & Semester Info -->
     <div class="mb-6 p-4 bg-brown-500 text-white rounded-xl flex items-center justify-between">
         <div class="flex items-center gap-4">
+            <a href="<?= base_url('laboran/modul/change') ?>" class="text-white hover:text-brown-100 transition" title="Kembali ke Pilih Matkul">
+                <span class="material-icons-outlined text-3xl">arrow_back</span>
+            </a>
             <span class="material-icons-outlined text-3xl opacity-80">menu_book</span>
             <div>
                 <p class="font-medium">
-                    <?= htmlspecialchars($selected_matkul->nama_matkul) ?>
+                    <?= htmlspecialchars($selected_matkum->nama_matkul) ?>
                 </p>
                 <p class="text-sm opacity-80">
-                    <?= $selected_matkul->kode_matkul ?> •
+                    <?= $selected_matkum->kode_matkul ?> •
                     <?= $current_semester->nama_semester ?>
                     <?= $current_semester->tahun_ajaran ?>
                 </p>
             </div>
         </div>
-        <a href="<?= base_url('laboran/finish_upload') ?>"
-            class="px-4 py-2 bg-white text-brown-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition">
-            Ganti Matkul
-        </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -51,30 +48,7 @@
                     Form Upload Modul
                 </h2>
                 <form action="" method="POST" enctype="multipart/form-data">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="pertemuan_id" class="block text-sm font-medium text-gray-700 mb-1">
-                                Pertemuan <span class="text-red-500">*</span>
-                            </label>
-                            <select id="pertemuan_id" name="pertemuan_id" required
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none">
-                                <option value="">Pilih Pertemuan</option>
-                                <?php foreach ($pertemuan as $p): ?>
-                                    <option value="<?= $p->id ?>">Pertemuan
-                                        <?= $p->pertemuan_ke ?>:
-                                        <?= htmlspecialchars($p->judul) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <?php if (empty($pertemuan)): ?>
-                                <p class="text-xs text-amber-600 mt-1">
-                                    <span class="material-icons-outlined text-xs align-middle">warning</span>
-                                    Belum ada pertemuan. <a href="<?= base_url('laboran/pertemuan/create') ?>"
-                                        class="underline">Tambah pertemuan</a>
-                                </p>
-                            <?php endif; ?>
-                        </div>
-
+                    <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label for="tipe_file" class="block text-sm font-medium text-gray-700 mb-1">Tipe File</label>
                             <select id="tipe_file" name="tipe_file" onchange="toggleFileInput()"
@@ -153,31 +127,7 @@
                 </ul>
             </div>
 
-            <!-- Pertemuan Quick List -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div class="px-5 py-3 border-b border-gray-100">
-                    <h3 class="font-medium text-gray-800 text-sm">Pertemuan Tersedia</h3>
-                </div>
-                <?php if (!empty($pertemuan)): ?>
-                    <div class="divide-y divide-gray-100 max-h-64 overflow-y-auto">
-                        <?php foreach ($pertemuan as $p): ?>
-                            <div class="px-5 py-2.5 text-sm">
-                                <span class="font-medium text-gray-700">Pertemuan
-                                    <?= $p->pertemuan_ke ?>
-                                </span>
-                                <span class="text-gray-500">:
-                                    <?= htmlspecialchars($p->judul) ?>
-                                </span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="p-5 text-center text-gray-500 text-sm">
-                        <p>Belum ada pertemuan</p>
-                        <a href="<?= base_url('laboran/pertemuan/create') ?>" class="text-brown-500 underline">Tambah</a>
-                    </div>
-                <?php endif; ?>
-            </div>
+
         </div>
     </div>
 

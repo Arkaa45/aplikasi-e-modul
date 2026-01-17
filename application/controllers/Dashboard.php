@@ -8,7 +8,7 @@ class Dashboard extends MY_Controller
     {
         parent::__construct();
         $this->require_login();
-        $this->load->model(array('User_model', 'Semester_model', 'Matkul_model', 'Modul_model'));
+        $this->load->model(array('User_model', 'Semester_model', 'Matkum_model', 'Modul_model'));
     }
 
     /**
@@ -44,7 +44,7 @@ class Dashboard extends MY_Controller
             'total_users' => $this->User_model->count_by_role(),
             'total_mahasiswa' => $this->User_model->count_by_role('mahasiswa'),
             'total_laboran' => $this->User_model->count_by_role('laboran'),
-            'total_matkul' => $this->Matkul_model->count_all(),
+            'total_matkum' => $this->Matkum_model->count_all(),
             'total_modul' => $this->Modul_model->count_all(),
             'current_semester' => $this->Semester_model->get_active(),
             'recent_moduls' => $this->Modul_model->get_recent(5)
@@ -63,7 +63,7 @@ class Dashboard extends MY_Controller
         $data = array(
             'title' => 'Dashboard Laboran',
             'page_title' => 'Dashboard',
-            'my_matkul' => $this->Matkul_model->get_by_laboran($user_id),
+            'my_matkum' => $this->Matkum_model->get_by_laboran($user_id),
             'my_moduls' => $this->Modul_model->get_by_uploader($user_id, 10),
             'current_semester' => $this->Semester_model->get_active()
         );
@@ -82,7 +82,7 @@ class Dashboard extends MY_Controller
         $data = array(
             'title' => 'Dashboard Mahasiswa',
             'page_title' => 'Dashboard',
-            'my_matkul' => $current_semester ? $this->Matkul_model->get_by_mahasiswa($user_id, $current_semester->id) : array(),
+            'my_matkum' => $current_semester ? $this->Matkum_model->get_by_mahasiswa($user_id, $current_semester->id) : array(),
             'current_semester' => $current_semester,
             'accessible_semesters' => $this->Semester_model->get_accessible()
         );

@@ -7,7 +7,7 @@ class Mahasiswa extends Mahasiswa_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Matkul_model', 'Pertemuan_model', 'Modul_model', 'Semester_model'));
+        $this->load->model(array('Matkum_model', 'Pertemuan_model', 'Modul_model', 'Semester_model'));
     }
 
     /**
@@ -28,9 +28,9 @@ class Mahasiswa extends Mahasiswa_Controller
     }
 
     /**
-     * Mata Kuliah List for a Semester
+     * Mata Praktikum List for a Semester
      */
-    public function matkul($semester_id = null)
+    public function matkum($semester_id = null)
     {
         $user_id = $this->session->userdata('user_id');
 
@@ -49,22 +49,22 @@ class Mahasiswa extends Mahasiswa_Controller
         }
 
         $semester = $this->Semester_model->get_by_id($semester_id);
-        $my_matkul = $this->Matkul_model->get_by_mahasiswa($user_id, $semester_id);
+        $my_matkum = $this->Matkum_model->get_by_mahasiswa($user_id, $semester_id);
 
         $data = array(
-            'title' => 'Mata Kuliah Praktikum',
-            'page_title' => 'Mata Kuliah Praktikum',
+            'title' => 'Mata Praktikum',
+            'page_title' => 'Mata Praktikum',
             'semester' => $semester,
-            'matkuls' => $my_matkul
+            'matkums' => $my_matkum
         );
 
-        $this->load_view('mahasiswa/matkul', $data);
+        $this->load_view('mahasiswa/matkum', $data);
     }
 
     /**
      * Pertemuan List for a Mata Kuliah
      */
-    public function pertemuan($matkul_id)
+    public function pertemuan($matkum_id)
     {
         $user_id = $this->session->userdata('user_id');
 
@@ -81,9 +81,9 @@ class Mahasiswa extends Mahasiswa_Controller
             redirect('mahasiswa/semester');
         }
 
-        $matkul = $this->Matkul_model->get_by_id($matkul_id);
+        $matkum = $this->Matkum_model->get_by_id($matkum_id);
         $semester = $this->Semester_model->get_by_id($semester_id);
-        $pertemuan = $this->Pertemuan_model->get_by_matkul($matkul_id, $semester_id);
+        $pertemuan = $this->Pertemuan_model->get_by_matkul($matkum_id, $semester_id);
 
         // Get modul count for each pertemuan
         foreach ($pertemuan as &$p) {
@@ -91,9 +91,9 @@ class Mahasiswa extends Mahasiswa_Controller
         }
 
         $data = array(
-            'title' => 'Pertemuan - ' . $matkul->nama_matkul,
-            'page_title' => $matkul->nama_matkul,
-            'matkul' => $matkul,
+            'title' => 'Pertemuan - ' . $matkum->nama_matkul,
+            'page_title' => $matkum->nama_matkul,
+            'matkum' => $matkum,
             'semester' => $semester,
             'pertemuan' => $pertemuan
         );

@@ -34,10 +34,10 @@
                     <span class="material-icons-outlined text-xl">calendar_month</span>
                     Kelola Semester
                 </a>
-                <a href="<?= base_url('admin/matkul') ?>"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'admin/matkul') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
+                <a href="<?= base_url('admin/matkum') ?>"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'admin/matkum') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
                     <span class="material-icons-outlined text-xl">menu_book</span>
-                    Kelola Mata Kuliah
+                    Kelola Mata Praktikum
                 </a>
                 <a href="<?= base_url('admin/activity') ?>"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'admin/activity') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
@@ -62,11 +62,7 @@
                     <span class="material-icons-outlined text-xl">upload_file</span>
                     Upload Modul
                 </a>
-                <a href="<?= base_url('laboran/pertemuan') ?>"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'laboran/pertemuan') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
-                    <span class="material-icons-outlined text-xl">event</span>
-                    Kelola Pertemuan
-                </a>
+
             </div>
 
         <?php elseif ($role == 'mahasiswa'): ?>

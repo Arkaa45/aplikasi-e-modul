@@ -7,7 +7,7 @@ class Admin extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('User_model', 'Semester_model', 'Matkul_model', 'Modul_model'));
+        $this->load->model(array('User_model', 'Semester_model', 'Matkum_model', 'Modul_model'));
     }
 
     /**
@@ -203,9 +203,9 @@ class Admin extends Admin_Controller
             redirect('admin/semester');
         }
 
-        // Handle form submission to add mata kuliah
+        // Handle form submission to add mata praktikum
         if ($this->input->post()) {
-            $matkul_data = array(
+            $matkum_data = array(
                 'kode_matkul' => $this->input->post('kode_matkul', TRUE),
                 'nama_matkul' => $this->input->post('nama_matkul', TRUE),
                 'sks' => $this->input->post('sks', TRUE),
@@ -213,57 +213,85 @@ class Admin extends Admin_Controller
                 'is_active' => 1
             );
 
-            $this->Matkul_model->create($matkul_data);
-            $this->log_activity('create_matkul', 'Created mata kuliah: ' . $matkul_data['nama_matkul']);
-            $this->session->set_flashdata('success', 'Mata kuliah berhasil ditambahkan. Tambahkan lagi atau selesai.');
+            $this->Matkum_model->create($matkum_data);
+            $this->log_activity('create_matkum', 'Created mata praktikum: ' . $matkum_data['nama_matkul']);
+            $this->session->set_flashdata('success', 'Mata praktikum berhasil ditambahkan. Tambahkan lagi atau selesai.');
             redirect('admin/semester/courses/' . $id);
         }
 
         $data = array(
-            'title' => 'Tambah Mata Kuliah untuk Semester',
-            'page_title' => 'Mata Kuliah - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
+            'title' => 'Tambah Mata Praktikum untuk Semester',
+            'page_title' => 'Mata Praktikum - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
             'semester' => $semester,
-            'matkuls' => $this->Matkul_model->get_all()
+            'matkums' => $this->Matkum_model->get_all()
         );
 
         $this->load_view('admin/semester/courses', $data);
     }
 
     /**
-     * Mata Kuliah Management
+     * Mata Praktikum Management
      */
-    public function matkul($action = 'index', $id = null)
+    public function matkum($action = 'index', $id = null)
     {
         switch ($action) {
             case 'create':
-                $this->matkul_form();
+                $this->matkum_form();
                 break;
             case 'edit':
-                $this->matkul_form($id);
+                $this->matkum_form($id);
                 break;
             case 'delete':
-                $this->matkul_delete($id);
+                $this->matkum_delete($id);
                 break;
             default:
-                $this->matkul_list();
+                $this->matkum_list();
         }
     }
 
-    private function matkul_list()
+    private function matkum_list()
     {
+        $semester_id = $this->input->get('semester');
+        $selected_semester = null;
+        $matkums = array();
+
+        if ($semester_id) {
+            $selected_semester = $this->Semester_model->get_by_id($semester_id);
+            $matkums = $this->Matkum_model->get_all();
+        }
+
+        // Handle form submission for adding new matkum
+        if ($this->input->post()) {
+            $matkum_data = array(
+                'kode_matkul' => $this->input->post('kode_matkul', TRUE),
+                'nama_matkul' => $this->input->post('nama_matkul', TRUE),
+                'sks' => $this->input->post('sks', TRUE),
+                'deskripsi' => $this->input->post('deskripsi', TRUE),
+                'is_active' => 1
+            );
+
+            $this->Matkum_model->create($matkum_data);
+            $this->log_activity('create_matkum', 'Created mata praktikum: ' . $matkum_data['nama_matkul']);
+            $this->session->set_flashdata('success', 'Mata praktikum berhasil ditambahkan');
+            redirect('admin/matkum?semester=' . $this->input->post('semester_id'));
+        }
+
         $data = array(
-            'title' => 'Kelola Mata Kuliah',
-            'page_title' => 'Kelola Mata Kuliah',
-            'matkuls' => $this->Matkul_model->get_all()
+            'title' => 'Kelola Mata Praktikum',
+            'page_title' => 'Kelola Mata Praktikum',
+            'semesters' => $this->Semester_model->get_all(),
+            'semester_id' => $semester_id,
+            'selected_semester' => $selected_semester,
+            'matkums' => $matkums
         );
 
-        $this->load_view('admin/matkul/index', $data);
+        $this->load_view('admin/matkum/index', $data);
     }
 
-    private function matkul_form($id = null)
+    private function matkum_form($id = null)
     {
         if ($this->input->post()) {
-            $matkul_data = array(
+            $matkum_data = array(
                 'kode_matkul' => $this->input->post('kode_matkul', TRUE),
                 'nama_matkul' => $this->input->post('nama_matkul', TRUE),
                 'sks' => $this->input->post('sks', TRUE),
@@ -272,37 +300,93 @@ class Admin extends Admin_Controller
             );
 
             if ($id) {
-                $this->Matkul_model->update($id, $matkul_data);
-                $this->log_activity('update_matkul', 'Updated mata kuliah: ' . $matkul_data['nama_matkul']);
-                $this->session->set_flashdata('success', 'Mata kuliah berhasil diperbarui');
+                $this->Matkum_model->update($id, $matkum_data);
+                $this->log_activity('update_matkum', 'Updated mata praktikum: ' . $matkum_data['nama_matkul']);
+                $this->session->set_flashdata('success', 'Mata praktikum berhasil diperbarui');
             } else {
-                $this->Matkul_model->create($matkul_data);
-                $this->log_activity('create_matkul', 'Created mata kuliah: ' . $matkul_data['nama_matkul']);
-                $this->session->set_flashdata('success', 'Mata kuliah berhasil ditambahkan');
+                $this->Matkum_model->create($matkum_data);
+                $this->log_activity('create_matkum', 'Created mata praktikum: ' . $matkum_data['nama_matkul']);
+                $this->session->set_flashdata('success', 'Mata praktikum berhasil ditambahkan');
             }
 
-            redirect('admin/matkul');
+            redirect('admin/matkum');
         }
 
         $data = array(
-            'title' => $id ? 'Edit Mata Kuliah' : 'Tambah Mata Kuliah',
-            'page_title' => $id ? 'Edit Mata Kuliah' : 'Tambah Mata Kuliah',
-            'matkul_data' => $id ? $this->Matkul_model->get_by_id($id) : null,
+            'title' => $id ? 'Edit Mata Praktikum' : 'Tambah Mata Praktikum',
+            'page_title' => $id ? 'Edit Mata Praktikum' : 'Tambah Mata Praktikum',
+            'matkum_data' => $id ? $this->Matkum_model->get_by_id($id) : null,
             'edit_mode' => $id ? true : false
         );
 
-        $this->load_view('admin/matkul/form', $data);
+        $this->load_view('admin/matkum/form', $data);
     }
 
-    private function matkul_delete($id)
+    private function matkum_delete($id)
     {
-        $matkul = $this->Matkul_model->get_by_id($id);
-        if ($matkul) {
-            $this->Matkul_model->delete($id);
-            $this->log_activity('delete_matkul', 'Deleted mata kuliah: ' . $matkul->nama_matkul);
-            $this->session->set_flashdata('success', 'Mata kuliah berhasil dihapus');
+        $matkum = $this->Matkum_model->get_by_id($id);
+        if ($matkum) {
+            $this->Matkum_model->delete($id);
+            $this->log_activity('delete_matkum', 'Deleted mata praktikum: ' . $matkum->nama_matkul);
+            $this->session->set_flashdata('success', 'Mata praktikum berhasil dihapus');
         }
-        redirect('admin/matkul');
+        redirect('admin/matkum');
+    }
+
+    /**
+     * Assign Laboran to Mata Praktikum
+     */
+    public function assign_laboran($matkum_id = null)
+    {
+        if (!$matkum_id) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($matkum_id);
+        if (!$matkum) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        // Handle form submission
+        if ($this->input->post()) {
+            $laboran_id = $this->input->post('laboran_id');
+            $action = $this->input->post('action');
+
+            if ($action == 'assign') {
+                // Check if already assigned
+                if (!$this->Matkum_model->is_laboran_assigned($matkum_id, $laboran_id)) {
+                    $this->Matkum_model->assign_laboran($matkum_id, $laboran_id);
+                    $this->log_activity('assign_laboran', 'Assigned laboran to: ' . $matkum->nama_matkul);
+                    $this->session->set_flashdata('success', 'Laboran berhasil ditugaskan');
+                }
+            } else if ($action == 'remove') {
+                $this->Matkum_model->remove_laboran($matkum_id, $laboran_id);
+                $this->log_activity('remove_laboran', 'Removed laboran from: ' . $matkum->nama_matkul);
+                $this->session->set_flashdata('success', 'Laboran berhasil dihapus dari mata praktikum');
+            }
+
+            redirect('admin/assign_laboran/' . $matkum_id);
+        }
+
+        // Get all laborans and assigned laborans
+        $all_laborans = $this->User_model->get_all('laboran', 1); // Active laborans only
+        $assigned_laborans = $this->Matkum_model->get_laborans_by_matkul($matkum_id);
+        $assigned_ids = array_map(function ($l) {
+            return $l->id;
+        }, $assigned_laborans);
+
+        $data = array(
+            'title' => 'Assign Laboran',
+            'page_title' => 'Assign Laboran - ' . $matkum->nama_matkul,
+            'matkum' => $matkum,
+            'all_laborans' => $all_laborans,
+            'assigned_laborans' => $assigned_laborans,
+            'assigned_ids' => $assigned_ids
+        );
+
+        $this->load_view('admin/matkum/assign_laboran', $data);
     }
 
     /**

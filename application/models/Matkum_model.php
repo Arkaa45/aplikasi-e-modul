@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Matkul_model extends CI_Model
+class Matkum_model extends CI_Model
 {
 
     private $table = 'mata_kuliah';
@@ -149,5 +149,28 @@ class Matkul_model extends CI_Model
         $this->db->where('id_user', $user_id);
         $this->db->where('id_semester', $semester_id);
         return $this->db->delete('user_matkul');
+    }
+
+    /**
+     * Get all laborans assigned to a mata kuliah
+     */
+    public function get_laborans_by_matkul($matkul_id)
+    {
+        $this->db->select('users.*');
+        $this->db->from('users');
+        $this->db->join('laboran_matkul', 'laboran_matkul.id_user = users.id');
+        $this->db->where('laboran_matkul.id_matkul', $matkul_id);
+        $this->db->order_by('users.nama', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Check if laboran is assigned to matkul
+     */
+    public function is_laboran_assigned($matkul_id, $user_id)
+    {
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('id_user', $user_id);
+        return $this->db->count_all_results('laboran_matkul') > 0;
     }
 }

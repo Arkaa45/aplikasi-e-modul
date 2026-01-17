@@ -1,84 +1,85 @@
 <!-- Page Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-    <div>
-        <h1 class="text-xl font-medium text-gray-800"><?= $page_title ?></h1>
-        <p class="text-sm text-gray-500">Atur jadwal pertemuan praktikum</p>
-    </div>
-    <a href="<?= base_url('laboran/pertemuan/create') ?>"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 hover:bg-brown-600 text-white rounded-lg transition">
-        <span class="material-icons-outlined text-lg">add</span>
-        Tambah Pertemuan
-    </a>
+<div class="mb-6">
+    <h1 class="text-xl font-medium text-gray-800"><?= $page_title ?></h1>
+    <p class="text-sm text-gray-500">
+        <a href="<?= base_url('dashboard') ?>" class="hover:text-brown-500">Dashboard</a>
+        <span class="mx-2">/</span>
+        <a href="<?= base_url('laboran/finish_pertemuan') ?>" class="hover:text-brown-500">Pertemuan</a>
+        <span class="mx-2">/</span>
+        <span><?= htmlspecialchars($selected_matkul->nama_matkul) ?></span>
+    </p>
 </div>
 
-<!-- Filter -->
-<div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
-    <form method="GET" class="flex flex-wrap items-center gap-4">
-        <span class="text-sm text-gray-600">Mata Kuliah:</span>
-        <select name="matkul" onchange="this.form.submit()"
-            class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brown-400 outline-none">
-            <option value="">-- Pilih --</option>
-            <?php foreach ($my_matkul as $matkul): ?>
-                <option value="<?= $matkul->id ?>" <?= $matkul_id == $matkul->id ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($matkul->nama_matkul) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <?php if ($current_semester): ?>
-            <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
-                <?= $current_semester->nama_semester ?>     <?= $current_semester->tahun_ajaran ?>
-            </span>
-        <?php endif; ?>
-    </form>
-</div>
-
-<!-- Pertemuan List -->
-<?php if ($matkul_id): ?>
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <?php if (!empty($pertemuan)): ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-5">
-                <?php foreach ($pertemuan as $p): ?>
-                    <div class="border border-gray-200 rounded-xl p-4 hover:border-brown-300 transition">
-                        <div class="flex items-start gap-3">
-                            <div
-                                class="w-10 h-10 rounded-lg bg-brown-100 flex items-center justify-center text-brown-700 font-semibold">
-                                <?= $p->pertemuan_ke ?>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-medium text-gray-800"><?= htmlspecialchars($p->judul) ?></h3>
-                                <?php if ($p->tanggal): ?>
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        <span class="material-icons-outlined text-xs align-middle">calendar_today</span>
-                                        <?= date('d M Y', strtotime($p->tanggal)) ?>
-                                    </p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 mt-3 pt-3 border-t border-gray-100">
-                            <a href="<?= base_url('laboran/pertemuan/edit/' . $p->id) ?>"
-                                class="flex-1 px-3 py-1.5 text-center text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Edit</a>
-                            <a href="<?= base_url('laboran/pertemuan/delete/' . $p->id) ?>"
-                                class="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50"
-                                data-confirm-delete>Hapus</a>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="p-12 text-center">
-                <span class="material-icons-outlined text-5xl text-gray-300 mb-3">event</span>
-                <p class="text-gray-600 font-medium">Belum ada pertemuan</p>
-                <a href="<?= base_url('laboran/pertemuan/create') ?>"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 text-white rounded-lg mt-4">
-                    <span class="material-icons-outlined text-lg">add</span>
-                    Tambah Pertemuan
-                </a>
-            </div>
-        <?php endif; ?>
+<?php if (!$current_semester): ?>
+    <div class="p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg flex items-center gap-3">
+        <span class="material-icons-outlined">warning</span>
+        Belum ada semester aktif.
     </div>
 <?php else: ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <span class="material-icons-outlined text-5xl text-gray-300 mb-3">touch_app</span>
-        <p class="text-gray-500">Pilih mata kuliah untuk melihat pertemuan</p>
+
+    <!-- Matkul & Semester Info -->
+    <div class="mb-6 p-4 bg-brown-500 text-white rounded-xl flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <span class="material-icons-outlined text-3xl opacity-80">menu_book</span>
+            <div>
+                <p class="font-medium"><?= htmlspecialchars($selected_matkul->nama_matkul) ?></p>
+                <p class="text-sm opacity-80"><?= $selected_matkul->kode_matkul ?> • <?= $current_semester->nama_semester ?>
+                    <?= $current_semester->tahun_ajaran ?></p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="<?= base_url('laboran/pertemuan/create') ?>"
+                class="px-4 py-2 bg-white text-brown-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition flex items-center gap-2">
+                <span class="material-icons-outlined text-lg">add</span>
+                Tambah Pertemuan
+            </a>
+            <a href="<?= base_url('laboran/finish_pertemuan') ?>"
+                class="px-4 py-2 bg-brown-600 text-white rounded-lg text-sm font-medium hover:bg-brown-700 transition">
+                Ganti Mata Praktikum
+            </a>
+        </div>
     </div>
+
+    <!-- Pertemuan List -->
+    <?php if (!empty($pertemuan)): ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <?php foreach ($pertemuan as $p): ?>
+                <div class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition card-hover">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brown-100 flex items-center justify-center text-brown-700 font-semibold">
+                            <?= $p->pertemuan_ke ?>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800"><?= htmlspecialchars($p->judul) ?></h3>
+                            <?php if ($p->deskripsi): ?>
+                                <p class="text-sm text-gray-500 mt-1"><?= htmlspecialchars(substr($p->deskripsi, 0, 80)) ?>...</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-1 mt-4 pt-3 border-t border-gray-100">
+                        <a href="<?= base_url('laboran/pertemuan/edit/' . $p->id) ?>" class="p-2 hover:bg-gray-100 rounded-full">
+                            <span class="material-icons-outlined text-gray-500 text-lg">edit</span>
+                        </a>
+                        <a href="<?= base_url('laboran/pertemuan/delete/' . $p->id) ?>" class="p-2 hover:bg-red-50 rounded-full"
+                            data-confirm-delete>
+                            <span class="material-icons-outlined text-red-500 text-lg">delete</span>
+                        </a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <span class="material-icons-outlined text-5xl text-gray-300 mb-3">event</span>
+            <p class="text-gray-600 font-medium">Belum ada pertemuan</p>
+            <p class="text-gray-500 text-sm mb-4">Tambahkan pertemuan untuk mata praktikum ini</p>
+            <a href="<?= base_url('laboran/pertemuan/create') ?>"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 text-white rounded-lg">
+                <span class="material-icons-outlined text-lg">add</span>
+                Tambah Pertemuan
+            </a>
+        </div>
+    <?php endif; ?>
+
 <?php endif; ?>

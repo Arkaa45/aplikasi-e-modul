@@ -15,20 +15,20 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- My Courses -->
     <div class="lg:col-span-2">
-        <h2 class="text-sm font-medium text-gray-600 mb-4">Mata Kuliah Praktikum Saya</h2>
+        <h2 class="text-sm font-medium text-gray-600 mb-4">Mata Praktikum Saya</h2>
 
-        <?php if (!empty($my_matkul)): ?>
+        <?php if (!empty($my_matkum)): ?>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <?php foreach ($my_matkul as $matkul): ?>
-                    <a href="<?= base_url('mahasiswa/pertemuan/' . $matkul->id) ?>"
+                <?php foreach ($my_matkum as $matkum): ?>
+                    <a href="<?= base_url('mahasiswa/pertemuan/' . $matkum->id) ?>"
                         class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition card-hover">
                         <div class="flex items-start gap-4">
                             <div class="w-12 h-12 rounded-lg bg-brown-400 flex items-center justify-center flex-shrink-0">
                                 <span class="material-icons-outlined text-white">menu_book</span>
                             </div>
                             <div>
-                                <h3 class="font-medium text-gray-800"><?= htmlspecialchars($matkul->nama_matkul) ?></h3>
-                                <p class="text-sm text-gray-500"><?= $matkul->kode_matkul ?></p>
+                                <h3 class="font-medium text-gray-800"><?= htmlspecialchars($matkum->nama_matkul) ?></h3>
+                                <p class="text-sm text-gray-500"><?= $matkum->kode_matkul ?></p>
                             </div>
                         </div>
                     </a>
@@ -37,7 +37,7 @@
         <?php else: ?>
             <div class="bg-white rounded-xl border border-gray-200 p-10 text-center">
                 <span class="material-icons-outlined text-5xl text-gray-300 mb-3">menu_book</span>
-                <p class="text-gray-600 font-medium">Belum terdaftar di mata kuliah</p>
+                <p class="text-gray-600 font-medium">Belum terdaftar di mata praktikum</p>
                 <p class="text-gray-500 text-sm">Hubungi admin untuk pendaftaran</p>
             </div>
         <?php endif; ?>
@@ -50,7 +50,7 @@
             <?php if (!empty($accessible_semesters)): ?>
                 <div class="divide-y divide-gray-100">
                     <?php foreach ($accessible_semesters as $semester): ?>
-                        <a href="<?= base_url('mahasiswa/matkul/' . $semester->id) ?>"
+                        <a href="<?= base_url('mahasiswa/matkum/' . $semester->id) ?>"
                             class="block px-5 py-4 hover:bg-gray-50 transition">
                             <div class="flex items-center justify-between">
                                 <div>

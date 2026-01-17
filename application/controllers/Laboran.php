@@ -7,7 +7,7 @@ class Laboran extends Laboran_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Matkul_model', 'Pertemuan_model', 'Modul_model', 'Semester_model'));
+        $this->load->model(array('Matkum_model', 'Pertemuan_model', 'Modul_model', 'Semester_model'));
     }
 
     /**
@@ -22,25 +22,67 @@ class Laboran extends Laboran_Controller
             case 'delete':
                 $this->modul_delete($id);
                 break;
+            case 'view':
+                $this->modul_view($id);
+                break;
             case 'toggle':
                 $this->modul_toggle($id);
                 break;
             default:
-                $this->modul_list();
+                // If action is index but id is present (e.g. modul/index/change), pass id
+                if ($action == 'index' && !empty($id)) {
+                    $this->modul_list($id);
+                } else {
+                    $this->modul_list($action); // pass action as potential matkum_id
+                }
         }
     }
 
-    private function modul_list()
+    private function modul_list($matkum_id = null)
     {
         $user_id = $this->session->userdata('user_id');
-        $matkul_filter = $this->input->get('matkul');
+        $my_matkum = $this->Matkum_model->get_by_laboran($user_id);
+        $current_semester = $this->Semester_model->get_active();
+
+        // Check for 'change' action to reset selection
+        if ($matkum_id === 'change') {
+            $this->session->unset_userdata('modul_list_matkum_id');
+            redirect('laboran/modul');
+        }
+
+        // If numeric argument passed, treat as matkum_id
+        if (is_numeric($matkum_id)) {
+            $this->session->set_userdata('modul_list_matkum_id', $matkum_id);
+        }
+
+        $selected_matkum_id = $this->session->userdata('modul_list_matkum_id');
+
+        // If no matkum selected, show selection page
+        if (!$selected_matkum_id) {
+            $data = array(
+                'title' => 'Pilih Mata Praktikum',
+                'page_title' => 'Pilih Mata Praktikum',
+                'my_matkum' => $my_matkum,
+                'current_semester' => $current_semester,
+                'target_url' => 'laboran/modul'
+            );
+            $this->load_view('laboran/modul/select_matkul', $data);
+            return;
+        }
+
+        // Get selected matkum info
+        $selected_matkum = $this->Matkum_model->get_by_id($selected_matkum_id);
+        if (!$selected_matkum) {
+            $this->session->unset_userdata('modul_list_matkum_id');
+            redirect('laboran/modul');
+        }
 
         $data = array(
             'title' => 'Kelola Modul',
-            'page_title' => 'Kelola Modul',
-            'moduls' => $this->Modul_model->get_by_uploader($user_id),
-            'my_matkul' => $this->Matkul_model->get_by_laboran($user_id),
-            'matkul_filter' => $matkul_filter
+            'page_title' => 'Kelola Modul - ' . $selected_matkum->nama_matkul,
+            'moduls' => $this->Modul_model->get_by_matkul_uploader($selected_matkum_id, $user_id),
+            'selected_matkum' => $selected_matkum,
+            'current_semester' => $current_semester
         );
 
         $this->load_view('laboran/modul/index', $data);
@@ -127,50 +169,92 @@ class Laboran extends Laboran_Controller
         redirect('laboran/modul');
     }
 
+    private function modul_view($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+        $modul = $this->Modul_model->get_detail($id);
+
+        if (!$modul || $modul->uploaded_by != $user_id) {
+            $this->session->set_flashdata('error', 'Modul tidak ditemukan atau bukan milik Anda');
+            redirect('laboran/modul');
+        }
+
+        $data = array(
+            'title' => 'Detail Modul',
+            'page_title' => 'Detail Modul',
+            'modul' => $modul
+        );
+
+        $this->load_view('laboran/modul/view', $data);
+    }
+
     /**
      * Upload Modul
      */
-    public function upload($matkul_id = null)
+    public function upload($matkum_id = null)
     {
         $user_id = $this->session->userdata('user_id');
-        $my_matkul = $this->Matkul_model->get_by_laboran($user_id);
+        $my_matkum = $this->Matkum_model->get_by_laboran($user_id);
         $current_semester = $this->Semester_model->get_active();
 
-        // If matkul_id is provided, store it in session
-        if ($matkul_id) {
-            $this->session->set_userdata('selected_matkul_id', $matkul_id);
-        } else if ($this->input->get('matkul')) {
-            $this->session->set_userdata('selected_matkul_id', $this->input->get('matkul'));
+        if (empty($my_matkum)) {
+            $this->load_view('laboran/modul/empty_state', [
+                'title' => 'Upload Modul',
+                'message' => 'Anda belum ditugaskan ke mata praktikum manapun.'
+            ]);
+            return;
         }
 
-        $selected_matkul_id = $this->session->userdata('selected_matkul_id');
+        // Check if matkum is selected or passed in URL
+        if (!$matkum_id) {
+            // Check session
+            $matkum_id = $this->session->userdata('upload_matkum_id');
+        }
 
-        // If no matkul selected, show selection page
-        if (!$selected_matkul_id) {
+        // If still no matkum_id, show selection
+        if (!$matkum_id) {
             $data = array(
-                'title' => 'Pilih Mata Kuliah',
-                'page_title' => 'Pilih Mata Kuliah',
-                'my_matkul' => $my_matkul,
-                'current_semester' => $current_semester
+                'title' => 'Upload Modul - Pilih Mata Praktikum',
+                'page_title' => 'Upload Modul',
+                'my_matkum' => $my_matkum,
+                'current_semester' => $current_semester,
+                'target_url' => 'laboran/upload'
             );
             $this->load_view('laboran/modul/select_matkul', $data);
             return;
         }
 
-        // Get selected matkul info
-        $selected_matkul = $this->Matkul_model->get_by_id($selected_matkul_id);
-        if (!$selected_matkul) {
-            $this->session->unset_userdata('selected_matkul_id');
+        // Save selection to session
+        $this->session->set_userdata('upload_matkum_id', $matkum_id);
+
+        $selected_matkum = $this->Matkum_model->get_by_id($matkum_id);
+
+        // Validate access
+        $has_access = false;
+        foreach ($my_matkum as $mk) {
+            if ($mk->id == $matkum_id) {
+                $has_access = true;
+                break;
+            }
+        }
+
+        if (!$has_access) {
+            $this->session->unset_userdata('upload_matkum_id');
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses ke mata praktikum ini.');
             redirect('laboran/upload');
         }
 
         if ($this->input->post()) {
-            $pertemuan_id = $this->input->post('pertemuan_id');
+            $judul_modul = $this->input->post('judul_modul', TRUE);
+
+            // Auto create pertemuan
+            $pertemuan_id = $this->Pertemuan_model->create_auto($matkum_id, $current_semester->id, $judul_modul);
+
             $tipe_file = $this->input->post('tipe_file', TRUE);
 
             $modul_data = array(
                 'id_pertemuan' => $pertemuan_id,
-                'judul_modul' => $this->input->post('judul_modul', TRUE),
+                'judul_modul' => $judul_modul,
                 'deskripsi' => $this->input->post('deskripsi', TRUE),
                 'tipe_file' => $tipe_file,
                 'uploaded_by' => $user_id,
@@ -184,6 +268,9 @@ class Laboran extends Laboran_Controller
                     if ($upload_result['success']) {
                         $modul_data['file_modul'] = $upload_result['file_name'];
                     } else {
+                        // Rollback pertemuan creation if upload fails
+                        $this->Pertemuan_model->delete($pertemuan_id);
+
                         $this->session->set_flashdata('error', $upload_result['error']);
                         redirect('laboran/upload');
                     }
@@ -193,22 +280,15 @@ class Laboran extends Laboran_Controller
             }
 
             $this->Modul_model->create($modul_data);
-            $this->log_activity('upload_modul', 'Uploaded modul: ' . $modul_data['judul_modul']);
-            $this->session->set_flashdata('success', 'Modul berhasil diupload! Tambahkan modul lainnya atau klik Selesai.');
+            $this->log_activity('upload_modul', 'Uploaded modul and created pertemuan: ' . $modul_data['judul_modul']);
+            $this->session->set_flashdata('success', 'Modul berhasil diupload dan Pertemuan baru berhasil dibuat! Tambahkan modul lainnya atau klik Selesai.');
             redirect('laboran/upload'); // Redirect back to continue adding
-        }
-
-        // Get pertemuan for selected matkul
-        $pertemuan = array();
-        if ($current_semester) {
-            $pertemuan = $this->Pertemuan_model->get_by_matkul($selected_matkul_id, $current_semester->id);
         }
 
         $data = array(
             'title' => 'Upload Modul',
-            'page_title' => 'Upload Modul - ' . $selected_matkul->nama_matkul,
-            'selected_matkul' => $selected_matkul,
-            'pertemuan' => $pertemuan,
+            'page_title' => 'Upload Modul - ' . $selected_matkum->nama_matkul,
+            'selected_matkum' => $selected_matkum,
             'current_semester' => $current_semester
         );
 
@@ -224,104 +304,7 @@ class Laboran extends Laboran_Controller
         redirect('laboran/modul');
     }
 
-    /**
-     * Pertemuan Management
-     */
-    public function pertemuan($action = 'index', $id = null)
-    {
-        switch ($action) {
-            case 'create':
-                $this->pertemuan_form();
-                break;
-            case 'edit':
-                $this->pertemuan_form($id);
-                break;
-            case 'delete':
-                $this->pertemuan_delete($id);
-                break;
-            default:
-                $this->pertemuan_list();
-        }
-    }
 
-    private function pertemuan_list()
-    {
-        $user_id = $this->session->userdata('user_id');
-        $matkul_id = $this->input->get('matkul');
-        $my_matkul = $this->Matkul_model->get_by_laboran($user_id);
-        $current_semester = $this->Semester_model->get_active();
-
-        $pertemuan = array();
-        if ($matkul_id && $current_semester) {
-            $pertemuan = $this->Pertemuan_model->get_by_matkul($matkul_id, $current_semester->id);
-        }
-
-        $data = array(
-            'title' => 'Kelola Pertemuan',
-            'page_title' => 'Kelola Pertemuan',
-            'my_matkul' => $my_matkul,
-            'pertemuan' => $pertemuan,
-            'matkul_id' => $matkul_id,
-            'current_semester' => $current_semester
-        );
-
-        $this->load_view('laboran/pertemuan/index', $data);
-    }
-
-    private function pertemuan_form($id = null)
-    {
-        $user_id = $this->session->userdata('user_id');
-        $my_matkul = $this->Matkul_model->get_by_laboran($user_id);
-        $current_semester = $this->Semester_model->get_active();
-
-        if ($this->input->post()) {
-            $pertemuan_data = array(
-                'id_matkul' => $this->input->post('id_matkul'),
-                'id_semester' => $current_semester->id,
-                'pertemuan_ke' => $this->input->post('pertemuan_ke'),
-                'judul' => $this->input->post('judul', TRUE),
-                'deskripsi' => $this->input->post('deskripsi', TRUE),
-                'tanggal' => $this->input->post('tanggal')
-            );
-
-            if ($id) {
-                $this->Pertemuan_model->update($id, $pertemuan_data);
-                $this->log_activity('update_pertemuan', 'Updated pertemuan');
-                $this->session->set_flashdata('success', 'Pertemuan berhasil diperbarui');
-            } else {
-                $this->Pertemuan_model->create($pertemuan_data);
-                $this->log_activity('create_pertemuan', 'Created pertemuan');
-                $this->session->set_flashdata('success', 'Pertemuan berhasil ditambahkan');
-            }
-
-            redirect('laboran/pertemuan?matkul=' . $pertemuan_data['id_matkul']);
-        }
-
-        $pertemuan_data = $id ? $this->Pertemuan_model->get_by_id($id) : null;
-
-        $data = array(
-            'title' => $id ? 'Edit Pertemuan' : 'Tambah Pertemuan',
-            'page_title' => $id ? 'Edit Pertemuan' : 'Tambah Pertemuan',
-            'my_matkul' => $my_matkul,
-            'pertemuan_data' => $pertemuan_data,
-            'current_semester' => $current_semester,
-            'edit_mode' => $id ? true : false
-        );
-
-        $this->load_view('laboran/pertemuan/form', $data);
-    }
-
-    private function pertemuan_delete($id)
-    {
-        $pertemuan = $this->Pertemuan_model->get_by_id($id);
-        if ($pertemuan) {
-            $this->Pertemuan_model->delete($id);
-            $this->log_activity('delete_pertemuan', 'Deleted pertemuan');
-            $this->session->set_flashdata('success', 'Pertemuan berhasil dihapus');
-            redirect('laboran/pertemuan?matkul=' . $pertemuan->id_matkul);
-        }
-        redirect('laboran/pertemuan');
-    }
 
     /**
      * File upload helper
@@ -351,19 +334,5 @@ class Laboran extends Laboran_Controller
         }
     }
 
-    /**
-     * AJAX: Get pertemuan by matkul
-     */
-    public function get_pertemuan_ajax($matkul_id)
-    {
-        $current_semester = $this->Semester_model->get_active();
-        $pertemuan = array();
 
-        if ($current_semester) {
-            $pertemuan = $this->Pertemuan_model->get_by_matkul($matkul_id, $current_semester->id);
-        }
-
-        header('Content-Type: application/json');
-        echo json_encode($pertemuan);
-    }
 }

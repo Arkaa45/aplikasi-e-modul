@@ -97,4 +97,23 @@ class Pertemuan_model extends CI_Model
         $result = $this->db->get($this->table)->row();
         return ($result->pertemuan_ke ?? 0) + 1;
     }
+
+    /**
+     * Auto create pertemuan for modul upload
+     */
+    public function create_auto($matkul_id, $semester_id, $judul_modul)
+    {
+        $pertemuan_ke = $this->get_next_number($matkul_id, $semester_id);
+
+        $data = array(
+            'id_matkul' => $matkul_id,
+            'id_semester' => $semester_id,
+            'pertemuan_ke' => $pertemuan_ke,
+            'judul' => $judul_modul,
+            'deskripsi' => 'Pertemuan otomatis untuk modul: ' . $judul_modul,
+            'is_active' => 1
+        );
+
+        return $this->create($data);
+    }
 }

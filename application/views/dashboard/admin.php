@@ -54,7 +54,7 @@
                 <span class="material-icons-outlined text-amber-600">description</span>
             </div>
             <div>
-                <p class="text-2xl font-semibold text-gray-800"><?= $total_modul ?? 0 ?></p>
+                <p class="text-2xl font-semibold text-gray-800"><?= $total_matkum ?? 0 ?></p>
                 <p class="text-sm text-gray-500">Total Modul</p>
             </div>
         </div>
@@ -82,10 +82,10 @@
                 <span class="material-icons-outlined text-gray-500">edit_calendar</span>
                 <span class="text-sm text-gray-700">Tambah Semester</span>
             </a>
-            <a href="<?= base_url('admin/matkul/create') ?>"
+            <a href="<?= base_url('admin/matkum/create') ?>"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
                 <span class="material-icons-outlined text-gray-500">library_add</span>
-                <span class="text-sm text-gray-700">Tambah Mata Kuliah</span>
+                <span class="text-sm text-gray-700">Tambah Mata Praktikum</span>
             </a>
             <a href="<?= base_url('admin/activity') ?>"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
@@ -113,7 +113,8 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-800 truncate">
-                                    <?= htmlspecialchars($modul->judul_modul) ?></p>
+                                    <?= htmlspecialchars($modul->judul_modul) ?>
+                                </p>
                                 <p class="text-xs text-gray-500"><?= htmlspecialchars($modul->nama_matkul) ?></p>
                             </div>
                             <div class="text-right">

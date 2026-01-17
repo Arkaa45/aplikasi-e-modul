@@ -3,7 +3,7 @@
     <h1 class="text-xl font-medium text-gray-800">
         <?= $page_title ?>
     </h1>
-    <p class="text-sm text-gray-500">Pilih mata praktikum untuk mulai mengupload modul</p>
+    <p class="text-sm text-gray-500">Pilih mata praktikum untuk mengelola pertemuan</p>
 </div>
 
 <?php if (!$current_semester): ?>
@@ -23,10 +23,9 @@
 
     <!-- Matkul Selection -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <?php if (!empty($my_matkum)): ?>
-            <?php foreach ($my_matkum as $matkum): ?>
-                <?php $target_url = isset($target_url) ? $target_url : 'laboran/upload'; ?>
-                <a href="<?= base_url($target_url . '/' . $matkum->id) ?>"
+        <?php if (!empty($my_matkul)): ?>
+            <?php foreach ($my_matkul as $matkul): ?>
+                <a href="<?= base_url('laboran/pertemuan?matkul=' . $matkul->id) ?>"
                     class="block bg-white rounded-xl border border-gray-200 p-6 hover:border-brown-400 hover:shadow-md transition card-hover">
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 rounded-xl bg-brown-400 flex items-center justify-center">
@@ -34,10 +33,10 @@
                         </div>
                         <div>
                             <h3 class="font-medium text-gray-800">
-                                <?= htmlspecialchars($matkum->nama_matkul) ?>
+                                <?= htmlspecialchars($matkul->nama_matkul) ?>
                             </h3>
                             <p class="text-sm text-gray-500">
-                                <?= $matkum->kode_matkul ?>
+                                <?= $matkul->kode_matkul ?>
                             </p>
                         </div>
                     </div>

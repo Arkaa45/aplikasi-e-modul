@@ -1,14 +1,30 @@
 <!-- Page Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-    <div>
-        <h1 class="text-xl font-medium text-gray-800"><?= $page_title ?></h1>
-        <p class="text-sm text-gray-500">Kelola modul yang telah Anda upload</p>
+<div class="mb-6 p-4 bg-brown-500 text-white rounded-xl flex items-center justify-between">
+    <div class="flex items-center gap-4">
+        <a href="<?= base_url('laboran/modul/change') ?>" class="text-white hover:text-brown-100 transition"
+            title="Kembali ke Pilih Matkul">
+            <span class="material-icons-outlined text-3xl">arrow_back</span>
+        </a>
+        <span class="material-icons-outlined text-3xl opacity-80">menu_book</span>
+        <div>
+            <p class="font-medium">
+                <?= htmlspecialchars($selected_matkum->nama_matkul) ?>
+            </p>
+            <p class="text-sm opacity-80">
+                <?= $selected_matkum->kode_matkul ?> •
+                <?= $current_semester->nama_semester ?>
+                <?= $current_semester->tahun_ajaran ?>
+            </p>
+        </div>
     </div>
-    <a href="<?= base_url('laboran/upload') ?>"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 hover:bg-brown-600 text-white rounded-lg transition">
-        <span class="material-icons-outlined text-lg">upload_file</span>
-        Upload Modul
-    </a>
+    <div class="flex gap-2">
+
+        <a href="<?= base_url('laboran/upload/' . $selected_matkum->id) ?>"
+            class="px-4 py-2 border border-white text-white rounded-lg text-sm font-medium hover:bg-white hover:text-brown-600 transition flex items-center gap-2">
+            <span class="material-icons-outlined text-base">upload_file</span>
+            Upload Modul
+        </a>
+    </div>
 </div>
 
 <!-- Modul Table -->
@@ -34,7 +50,10 @@
                     <?php foreach ($moduls as $modul): ?>
                         <tr class="hover:bg-gray-50">
                             <td class="px-5 py-4">
-                                <p class="font-medium text-gray-800"><?= htmlspecialchars($modul->judul_modul) ?></p>
+                                <a href="<?= base_url('laboran/modul/view/' . $modul->id) ?>"
+                                    class="font-medium text-gray-800 hover:text-brown-500">
+                                    <?= htmlspecialchars($modul->judul_modul) ?>
+                                </a>
                                 <p class="text-xs text-gray-500"><?= date('d M Y', strtotime($modul->created_at)) ?></p>
                             </td>
                             <td class="px-5 py-4 text-sm text-gray-600"><?= htmlspecialchars($modul->nama_matkul) ?></td>
@@ -67,6 +86,7 @@
                             </td>
                             <td class="px-5 py-4">
                                 <div class="flex items-center gap-1">
+
                                     <a href="<?= base_url('laboran/modul/edit/' . $modul->id) ?>"
                                         class="p-2 hover:bg-gray-100 rounded-full">
                                         <span class="material-icons-outlined text-gray-500 text-lg">edit</span>

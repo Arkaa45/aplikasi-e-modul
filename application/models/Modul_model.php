@@ -144,6 +144,22 @@ class Modul_model extends CI_Model
     }
 
     /**
+     * Get moduls by matkul and uploader
+     */
+    public function get_by_matkul_uploader($matkul_id, $user_id)
+    {
+        $this->db->select('modul.*, pertemuan.pertemuan_ke, mata_kuliah.nama_matkul');
+        $this->db->from($this->table);
+        $this->db->join('pertemuan', 'pertemuan.id = modul.id_pertemuan');
+        $this->db->join('mata_kuliah', 'mata_kuliah.id = pertemuan.id_matkul');
+        $this->db->where('modul.uploaded_by', $user_id);
+        $this->db->where('pertemuan.id_matkul', $matkul_id);
+        $this->db->order_by('pertemuan.pertemuan_ke', 'ASC');
+        $this->db->order_by('modul.created_at', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    /**
      * Count total moduls
      */
     public function count_all()
