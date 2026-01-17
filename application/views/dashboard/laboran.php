@@ -21,7 +21,7 @@
             <?php if (!empty($my_matkum)): ?>
                 <div class="space-y-3">
                     <?php foreach ($my_matkum as $matkum): ?>
-                        <a href="<?= base_url('laboran/modul?matkum=' . $matkum->id) ?>"
+                        <a href="<?= base_url('laboran/modul/' . $matkum->id) ?>"
                             class="block p-4 rounded-lg border border-gray-200 hover:border-brown-300 hover:bg-cream-50 transition">
                             <p class="font-medium text-gray-800"><?= htmlspecialchars($matkum->nama_matkul) ?></p>
                             <p class="text-sm text-gray-500"><?= $matkum->kode_matkul ?></p>
