@@ -229,7 +229,8 @@ class Admin extends Admin_Controller
         $all_matkum = $this->Matkum_model->get_all(1);
         $assigned_matkum = $this->Semester_model->get_matkum($id);
         $assigned_ids = array_map(function ($m) {
-            return $m->id; }, $assigned_matkum);
+            return $m->id;
+        }, $assigned_matkum);
 
         $data = array(
             'title' => 'Assign Mata Praktikum',
@@ -377,10 +378,20 @@ class Admin extends Admin_Controller
 
     private function matkum_list()
     {
+        // Get all matkum
+        $matkums = $this->Matkum_model->get_all();
+
+        // Add laboran count for each matkum
+        foreach ($matkums as $matkum) {
+            $laborans = $this->Matkum_model->get_laborans_by_matkul($matkum->id);
+            $matkum->laboran_count = count($laborans);
+            $matkum->laborans = $laborans;
+        }
+
         $data = array(
             'title' => 'Kelola Mata Praktikum',
             'page_title' => 'Kelola Mata Praktikum',
-            'matkums' => $this->Matkum_model->get_all()
+            'matkums' => $matkums
         );
 
         $this->load_view('admin/matkum/index', $data);
@@ -490,7 +501,8 @@ class Admin extends Admin_Controller
         $all_laborans = $this->User_model->get_all('laboran', 1);
         $assigned_laborans = $this->Matkum_model->get_laborans_by_matkul($matkum_id);
         $assigned_ids = array_map(function ($l) {
-            return $l->id; }, $assigned_laborans);
+            return $l->id;
+        }, $assigned_laborans);
 
         $data = array(
             'title' => 'Assign Laboran',

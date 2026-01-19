@@ -49,33 +49,23 @@
         <?php elseif ($role == 'laboran'): ?>
             <!-- Laboran Menu -->
             <div class="px-3 pt-4 pb-2">
-                <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Kelola Praktikum</p>
+                <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Mata Praktikum Saya</p>
             </div>
             <div class="px-3 space-y-1">
-                <a href="<?= base_url('laboran/modul') ?>"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'laboran/modul') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
-                    <span class="material-icons-outlined text-xl">description</span>
-                    Kelola Modul
-                </a>
-                <a href="<?= base_url('laboran/upload') ?>"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'laboran/upload') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
-                    <span class="material-icons-outlined text-xl">upload_file</span>
-                    Upload Modul
-                </a>
-
+                <p class="px-3 py-2 text-xs text-gray-500">
+                    Klik mata praktikum dari dashboard untuk mengelola konten
+                </p>
             </div>
 
         <?php elseif ($role == 'mahasiswa'): ?>
             <!-- Mahasiswa Menu -->
             <div class="px-3 pt-4 pb-2">
-                <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Akses Modul</p>
+                <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Semester Saya</p>
             </div>
             <div class="px-3 space-y-1">
-                <a href="<?= base_url('mahasiswa/semester') ?>"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'mahasiswa/semester') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
-                    <span class="material-icons-outlined text-xl">calendar_today</span>
-                    Pilih Semester
-                </a>
+                <p class="px-3 py-2 text-xs text-gray-500">
+                    Pilih semester dari dashboard untuk mengakses mata praktikum
+                </p>
             </div>
         <?php endif; ?>
 
