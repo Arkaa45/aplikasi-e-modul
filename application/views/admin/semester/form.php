@@ -78,8 +78,7 @@
             Informasi
         </h3>
         <ul class="text-sm text-gray-600 space-y-2">
-            <li>• Semester aktif menjadi default untuk mahasiswa</li>
-            <li>• Hanya satu semester yang bisa aktif</li>
+            <li>• Semester terbaru berdasarkan tanggal mulai akan otomatis menjadi default</li>
             <li>• Mahasiswa hanya bisa akses semester yang sudah berjalan</li>
         </ul>
     </div>

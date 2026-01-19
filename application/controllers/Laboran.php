@@ -7,95 +7,208 @@ class Laboran extends Laboran_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Matkum_model', 'Pertemuan_model', 'Modul_model', 'Semester_model'));
+        $this->load->model(array('Matkum_model', 'Modul_model', 'Semester_model', 'Rps_model', 'Referensi_model'));
     }
 
     /**
-     * Modul Management
+     * Dashboard - Mata Praktikum List
      */
-    public function modul($action = 'index', $id = null)
-    {
-        switch ($action) {
-            case 'edit':
-                $this->modul_form($id);
-                break;
-            case 'delete':
-                $this->modul_delete($id);
-                break;
-            case 'view':
-                $this->modul_view($id);
-                break;
-            case 'toggle':
-                $this->modul_toggle($id);
-                break;
-            default:
-                // If action is index but id is present (e.g. modul/index/change), pass id
-                if ($action == 'index' && !empty($id)) {
-                    $this->modul_list($id);
-                } else {
-                    $this->modul_list($action); // pass action as potential matkum_id
-                }
-        }
-    }
-
-    private function modul_list($matkum_id = null)
+    public function index()
     {
         $user_id = $this->session->userdata('user_id');
         $my_matkum = $this->Matkum_model->get_by_laboran($user_id);
-        $current_semester = $this->Semester_model->get_active();
 
-        // Check for 'change' action to reset selection
-        if ($matkum_id === 'change') {
-            $this->session->unset_userdata('modul_list_matkum_id');
-            redirect('laboran/modul');
+        $data = array(
+            'title' => 'Dashboard Laboran',
+            'page_title' => 'Mata Praktikum Saya',
+            'my_matkum' => $my_matkum,
+            'current_semester' => $this->Semester_model->get_latest()
+        );
+
+        $this->load_view('laboran/index', $data);
+    }
+
+    /**
+     * Mata Praktikum Detail with Content
+     */
+    public function matkum($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        // Verify laboran has access to this matkum
+        if (!$this->Matkum_model->is_laboran_assigned($id, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses ke mata praktikum ini');
+            redirect('laboran');
         }
 
-        // If numeric argument passed, treat as matkum_id
-        if (is_numeric($matkum_id)) {
-            $this->session->set_userdata('modul_list_matkum_id', $matkum_id);
-        }
-
-        $selected_matkum_id = $this->session->userdata('modul_list_matkum_id');
-
-        // If no matkum selected, show selection page
-        if (!$selected_matkum_id) {
-            $data = array(
-                'title' => 'Pilih Mata Praktikum',
-                'page_title' => 'Pilih Mata Praktikum',
-                'my_matkum' => $my_matkum,
-                'current_semester' => $current_semester,
-                'target_url' => 'laboran/modul'
-            );
-            $this->load_view('laboran/modul/select_matkul', $data);
-            return;
-        }
-
-        // Get selected matkum info
-        $selected_matkum = $this->Matkum_model->get_by_id($selected_matkum_id);
-        if (!$selected_matkum) {
-            $this->session->unset_userdata('modul_list_matkum_id');
-            redirect('laboran/modul');
+        $matkum = $this->Matkum_model->get_with_content_counts($id);
+        if (!$matkum) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('laboran');
         }
 
         $data = array(
-            'title' => 'Kelola Modul',
-            'page_title' => 'Kelola Modul - ' . $selected_matkum->nama_matkul,
-            'moduls' => $this->Modul_model->get_by_matkul_uploader($selected_matkum_id, $user_id),
-            'selected_matkum' => $selected_matkum,
-            'current_semester' => $current_semester
+            'title' => $matkum->nama_matkul,
+            'page_title' => $matkum->kode_matkul . ' - ' . $matkum->nama_matkul,
+            'matkum' => $matkum,
+            'rps_list' => $this->Rps_model->get_by_matkul($id),
+            'referensi_list' => $this->Referensi_model->get_by_matkul($id),
+            'modul_slots' => $this->Modul_model->get_slots_by_matkul($id, 16)
         );
 
-        $this->load_view('laboran/modul/index', $data);
+        $this->load_view('laboran/matkum_detail', $data);
     }
 
-    private function modul_form($id)
+    /**
+     * Upload Content (RPS, Referensi, Modul)
+     */
+    public function upload($type, $matkum_id)
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        // Verify access
+        if (!$this->Matkum_model->is_laboran_assigned($matkum_id, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses');
+            redirect('laboran');
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($matkum_id);
+        if (!$matkum) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('laboran');
+        }
+
+        if ($this->input->post()) {
+            switch ($type) {
+                case 'rps':
+                    $this->upload_rps($matkum_id, $user_id);
+                    break;
+                case 'referensi':
+                    $this->upload_referensi($matkum_id, $user_id);
+                    break;
+                case 'modul':
+                    $this->upload_modul($matkum_id, $user_id);
+                    break;
+            }
+            redirect('laboran/matkum/' . $matkum_id);
+        }
+
+        $data = array(
+            'title' => 'Upload ' . ucfirst($type),
+            'page_title' => 'Upload ' . ucfirst($type) . ' - ' . $matkum->nama_matkul,
+            'matkum' => $matkum,
+            'type' => $type
+        );
+
+        if ($type == 'modul') {
+            $data['available_slots'] = array();
+            for ($i = 1; $i <= 16; $i++) {
+                if ($this->Modul_model->is_slot_available($matkum_id, $i)) {
+                    $data['available_slots'][] = $i;
+                }
+            }
+        }
+
+        $this->load_view('laboran/upload_content', $data);
+    }
+
+    private function upload_rps($matkum_id, $user_id)
+    {
+        if (!empty($_FILES['file']['name'])) {
+            $upload = $this->do_upload('file', 'rps');
+            if ($upload['success']) {
+                $data = array(
+                    'id_matkul' => $matkum_id,
+                    'judul' => $this->input->post('judul', TRUE),
+                    'file_path' => $upload['file_name'],
+                    'uploaded_by' => $user_id
+                );
+                $this->Rps_model->create($data);
+                $this->log_activity('upload_rps', 'Uploaded RPS');
+                $this->session->set_flashdata('success', 'RPS berhasil diupload');
+            } else {
+                $this->session->set_flashdata('error', $upload['error']);
+            }
+        }
+    }
+
+    private function upload_referensi($matkum_id, $user_id)
+    {
+        $tipe = $this->input->post('tipe');
+        $data = array(
+            'id_matkul' => $matkum_id,
+            'judul' => $this->input->post('judul', TRUE),
+            'deskripsi' => $this->input->post('deskripsi', TRUE),
+            'tipe' => $tipe,
+            'uploaded_by' => $user_id
+        );
+
+        if ($tipe == 'file' && !empty($_FILES['file']['name'])) {
+            $upload = $this->do_upload('file', 'referensi');
+            if ($upload['success']) {
+                $data['file_path'] = $upload['file_name'];
+            } else {
+                $this->session->set_flashdata('error', $upload['error']);
+                return;
+            }
+        } else if ($tipe == 'link') {
+            $data['link_external'] = $this->input->post('link_external', TRUE);
+        }
+
+        $this->Referensi_model->create($data);
+        $this->log_activity('upload_referensi', 'Uploaded Referensi');
+        $this->session->set_flashdata('success', 'Referensi berhasil ditambahkan');
+    }
+
+    private function upload_modul($matkum_id, $user_id)
+    {
+        $slot = $this->input->post('slot_number');
+        $tipe_file = $this->input->post('tipe_file');
+
+        $data = array(
+            'id_matkul' => $matkum_id,
+            'slot_number' => $slot,
+            'judul_modul' => $this->input->post('judul_modul', TRUE),
+            'deskripsi' => $this->input->post('deskripsi', TRUE),
+            'tipe_file' => $tipe_file,
+            'uploaded_by' => $user_id,
+            'is_visible' => $this->input->post('is_visible') ? 1 : 0
+        );
+
+        if ($tipe_file == 'link') {
+            $data['link_external'] = $this->input->post('link_external', TRUE);
+        } else if (!empty($_FILES['file_modul']['name'])) {
+            $upload = $this->do_upload('file_modul', 'modul');
+            if ($upload['success']) {
+                $data['file_modul'] = $upload['file_name'];
+            } else {
+                $this->session->set_flashdata('error', $upload['error']);
+                return;
+            }
+        }
+
+        $this->Modul_model->create($data);
+        $this->log_activity('upload_modul', 'Uploaded Modul slot ' . $slot);
+        $this->session->set_flashdata('success', 'Modul berhasil diupload');
+    }
+
+    /**
+     * Edit Modul
+     */
+    public function edit_modul($id)
     {
         $user_id = $this->session->userdata('user_id');
         $modul = $this->Modul_model->get_detail($id);
 
-        if (!$modul || $modul->uploaded_by != $user_id) {
-            $this->session->set_flashdata('error', 'Modul tidak ditemukan atau bukan milik Anda');
-            redirect('laboran/modul');
+        if (!$modul) {
+            $this->session->set_flashdata('error', 'Modul tidak ditemukan');
+            redirect('laboran');
+        }
+
+        // Verify access
+        if (!$this->Matkum_model->is_laboran_assigned($modul->id_matkul, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses');
+            redirect('laboran');
         }
 
         if ($this->input->post()) {
@@ -109,8 +222,8 @@ class Laboran extends Laboran_Controller
 
             // Handle file upload if new file provided
             if (!empty($_FILES['file_modul']['name'])) {
-                $upload_result = $this->do_upload('file_modul');
-                if ($upload_result['success']) {
+                $upload = $this->do_upload('file_modul', 'modul');
+                if ($upload['success']) {
                     // Delete old file
                     if ($modul->file_modul) {
                         $old_file = FCPATH . 'uploads/modul/' . $modul->file_modul;
@@ -118,17 +231,17 @@ class Laboran extends Laboran_Controller
                             unlink($old_file);
                         }
                     }
-                    $modul_data['file_modul'] = $upload_result['file_name'];
+                    $modul_data['file_modul'] = $upload['file_name'];
                 } else {
-                    $this->session->set_flashdata('error', $upload_result['error']);
-                    redirect('laboran/modul/edit/' . $id);
+                    $this->session->set_flashdata('error', $upload['error']);
+                    redirect('laboran/edit_modul/' . $id);
                 }
             }
 
             $this->Modul_model->update($id, $modul_data);
             $this->log_activity('update_modul', 'Updated modul: ' . $modul_data['judul_modul']);
             $this->session->set_flashdata('success', 'Modul berhasil diperbarui');
-            redirect('laboran/modul');
+            redirect('laboran/matkum/' . $modul->id_matkul);
         }
 
         $data = array(
@@ -137,202 +250,94 @@ class Laboran extends Laboran_Controller
             'modul' => $modul
         );
 
-        $this->load_view('laboran/modul/edit', $data);
+        $this->load_view('laboran/edit_modul', $data);
     }
 
-    private function modul_delete($id)
+    /**
+     * Delete Content
+     */
+    public function delete($type, $id)
     {
         $user_id = $this->session->userdata('user_id');
-        $modul = $this->Modul_model->get_by_id($id);
+        $matkum_id = null;
 
-        if ($modul && $modul->uploaded_by == $user_id) {
-            $this->Modul_model->delete($id);
-            $this->log_activity('delete_modul', 'Deleted modul: ' . $modul->judul_modul);
-            $this->session->set_flashdata('success', 'Modul berhasil dihapus');
-        } else {
-            $this->session->set_flashdata('error', 'Modul tidak ditemukan');
+        switch ($type) {
+            case 'rps':
+                $item = $this->Rps_model->get_by_id($id);
+                if ($item && $this->Matkum_model->is_laboran_assigned($item->id_matkul, $user_id)) {
+                    $matkum_id = $item->id_matkul;
+                    $this->Rps_model->delete($id);
+                    $this->log_activity('delete_rps', 'Deleted RPS');
+                    $this->session->set_flashdata('success', 'RPS berhasil dihapus');
+                }
+                break;
+            case 'referensi':
+                $item = $this->Referensi_model->get_by_id($id);
+                if ($item && $this->Matkum_model->is_laboran_assigned($item->id_matkul, $user_id)) {
+                    $matkum_id = $item->id_matkul;
+                    $this->Referensi_model->delete($id);
+                    $this->log_activity('delete_referensi', 'Deleted Referensi');
+                    $this->session->set_flashdata('success', 'Referensi berhasil dihapus');
+                }
+                break;
+            case 'modul':
+                $item = $this->Modul_model->get_by_id($id);
+                if ($item && $this->Matkum_model->is_laboran_assigned($item->id_matkul, $user_id)) {
+                    $matkum_id = $item->id_matkul;
+                    $this->Modul_model->delete($id);
+                    $this->log_activity('delete_modul', 'Deleted Modul');
+                    $this->session->set_flashdata('success', 'Modul berhasil dihapus');
+                }
+                break;
         }
 
-        redirect('laboran/modul');
+        if ($matkum_id) {
+            redirect('laboran/matkum/' . $matkum_id);
+        } else {
+            redirect('laboran');
+        }
     }
 
-    private function modul_toggle($id)
+    /**
+     * Toggle modul visibility
+     */
+    public function toggle_modul($id)
     {
         $user_id = $this->session->userdata('user_id');
         $modul = $this->Modul_model->get_by_id($id);
 
-        if ($modul && $modul->uploaded_by == $user_id) {
+        if ($modul && $this->Matkum_model->is_laboran_assigned($modul->id_matkul, $user_id)) {
             $this->Modul_model->toggle_visibility($id);
             $this->session->set_flashdata('success', 'Visibilitas modul berhasil diubah');
+            redirect('laboran/matkum/' . $modul->id_matkul);
         }
 
-        redirect('laboran/modul');
+        redirect('laboran');
     }
-
-    private function modul_view($id)
-    {
-        $user_id = $this->session->userdata('user_id');
-        $modul = $this->Modul_model->get_detail($id);
-
-        if (!$modul || $modul->uploaded_by != $user_id) {
-            $this->session->set_flashdata('error', 'Modul tidak ditemukan atau bukan milik Anda');
-            redirect('laboran/modul');
-        }
-
-        $data = array(
-            'title' => 'Detail Modul',
-            'page_title' => 'Detail Modul',
-            'modul' => $modul
-        );
-
-        $this->load_view('laboran/modul/view', $data);
-    }
-
-    /**
-     * Upload Modul
-     */
-    public function upload($matkum_id = null)
-    {
-        $user_id = $this->session->userdata('user_id');
-        $my_matkum = $this->Matkum_model->get_by_laboran($user_id);
-        $current_semester = $this->Semester_model->get_active();
-
-        if (empty($my_matkum)) {
-            $this->load_view('laboran/modul/empty_state', [
-                'title' => 'Upload Modul',
-                'message' => 'Anda belum ditugaskan ke mata praktikum manapun.'
-            ]);
-            return;
-        }
-
-        // Check if matkum is selected or passed in URL
-        if (!$matkum_id) {
-            // Check session
-            $matkum_id = $this->session->userdata('upload_matkum_id');
-        }
-
-        // If still no matkum_id, show selection
-        if (!$matkum_id) {
-            $data = array(
-                'title' => 'Upload Modul - Pilih Mata Praktikum',
-                'page_title' => 'Upload Modul',
-                'my_matkum' => $my_matkum,
-                'current_semester' => $current_semester,
-                'target_url' => 'laboran/upload'
-            );
-            $this->load_view('laboran/modul/select_matkul', $data);
-            return;
-        }
-
-        // Save selection to session
-        $this->session->set_userdata('upload_matkum_id', $matkum_id);
-
-        $selected_matkum = $this->Matkum_model->get_by_id($matkum_id);
-
-        // Validate access
-        $has_access = false;
-        foreach ($my_matkum as $mk) {
-            if ($mk->id == $matkum_id) {
-                $has_access = true;
-                break;
-            }
-        }
-
-        if (!$has_access) {
-            $this->session->unset_userdata('upload_matkum_id');
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses ke mata praktikum ini.');
-            redirect('laboran/upload');
-        }
-
-        if ($this->input->post()) {
-            $judul_modul = $this->input->post('judul_modul', TRUE);
-
-            // Auto create pertemuan
-            $pertemuan_id = $this->Pertemuan_model->create_auto($matkum_id, $current_semester->id, $judul_modul);
-
-            $tipe_file = $this->input->post('tipe_file', TRUE);
-
-            $modul_data = array(
-                'id_pertemuan' => $pertemuan_id,
-                'judul_modul' => $judul_modul,
-                'deskripsi' => $this->input->post('deskripsi', TRUE),
-                'tipe_file' => $tipe_file,
-                'uploaded_by' => $user_id,
-                'is_visible' => $this->input->post('is_visible') ? 1 : 0
-            );
-
-            // Handle file upload
-            if ($tipe_file == 'pdf' || $tipe_file == 'video' || $tipe_file == 'lainnya') {
-                if (!empty($_FILES['file_modul']['name'])) {
-                    $upload_result = $this->do_upload('file_modul');
-                    if ($upload_result['success']) {
-                        $modul_data['file_modul'] = $upload_result['file_name'];
-                    } else {
-                        // Rollback pertemuan creation if upload fails
-                        $this->Pertemuan_model->delete($pertemuan_id);
-
-                        $this->session->set_flashdata('error', $upload_result['error']);
-                        redirect('laboran/upload');
-                    }
-                }
-            } else if ($tipe_file == 'link') {
-                $modul_data['link_external'] = $this->input->post('link_external', TRUE);
-            }
-
-            $this->Modul_model->create($modul_data);
-            $this->log_activity('upload_modul', 'Uploaded modul and created pertemuan: ' . $modul_data['judul_modul']);
-            $this->session->set_flashdata('success', 'Modul berhasil diupload dan Pertemuan baru berhasil dibuat! Tambahkan modul lainnya atau klik Selesai.');
-            redirect('laboran/upload'); // Redirect back to continue adding
-        }
-
-        $data = array(
-            'title' => 'Upload Modul',
-            'page_title' => 'Upload Modul - ' . $selected_matkum->nama_matkul,
-            'selected_matkum' => $selected_matkum,
-            'current_semester' => $current_semester
-        );
-
-        $this->load_view('laboran/modul/upload_form', $data);
-    }
-
-    /**
-     * Clear selected matkul and go to modul list
-     */
-    public function finish_upload()
-    {
-        $this->session->unset_userdata('selected_matkul_id');
-        redirect('laboran/modul');
-    }
-
-
 
     /**
      * File upload helper
      */
-    private function do_upload($field_name)
+    private function do_upload($field_name, $folder)
     {
         $config = array(
-            'upload_path' => FCPATH . 'uploads/modul/',
-            'allowed_types' => 'pdf|doc|docx|ppt|pptx|mp4|webm|zip|rar',
-            'max_size' => 51200, // 50MB
+            'upload_path' => FCPATH . 'uploads/' . $folder . '/',
+            'allowed_types' => 'pdf|doc|docx|ppt|pptx|xls|xlsx|mp4|webm|zip|rar',
+            'max_size' => 51200,
             'encrypt_name' => TRUE
         );
+
+        if (!is_dir($config['upload_path'])) {
+            mkdir($config['upload_path'], 0755, TRUE);
+        }
 
         $this->load->library('upload', $config);
 
         if ($this->upload->do_upload($field_name)) {
             $upload_data = $this->upload->data();
-            return array(
-                'success' => true,
-                'file_name' => $upload_data['file_name']
-            );
+            return array('success' => true, 'file_name' => $upload_data['file_name']);
         } else {
-            return array(
-                'success' => false,
-                'error' => $this->upload->display_errors('', '')
-            );
+            return array('success' => false, 'error' => $this->upload->display_errors('', ''));
         }
     }
-
-
 }

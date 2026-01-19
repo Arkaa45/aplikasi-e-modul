@@ -21,7 +21,7 @@
             <?php if (!empty($my_matkum)): ?>
                 <div class="space-y-3">
                     <?php foreach ($my_matkum as $matkum): ?>
-                        <a href="<?= base_url('laboran/modul/' . $matkum->id) ?>"
+                        <a href="<?= base_url('laboran/matkum/' . $matkum->id) ?>"
                             class="block p-4 rounded-lg border border-gray-200 hover:border-brown-300 hover:bg-cream-50 transition">
                             <p class="font-medium text-gray-800"><?= htmlspecialchars($matkum->nama_matkul) ?></p>
                             <p class="text-sm text-gray-500"><?= $matkum->kode_matkul ?></p>
@@ -37,41 +37,23 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Recent Uploads -->
     <div class="space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-            <a href="<?= base_url('laboran/upload') ?>"
-                class="bg-brown-500 hover:bg-brown-600 text-white rounded-xl p-6 text-center transition">
-                <span class="material-icons-outlined text-4xl mb-2">upload_file</span>
-                <p class="font-medium">Upload Modul</p>
-            </a>
-            <a href="<?= base_url('laboran/pertemuan') ?>"
-                class="bg-gray-700 hover:bg-gray-800 text-white rounded-xl p-6 text-center transition">
-                <span class="material-icons-outlined text-4xl mb-2">event</span>
-                <p class="font-medium">Kelola Pertemuan</p>
-            </a>
-        </div>
-
-        <!-- Recent Uploads -->
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div class="px-5 py-4 border-b border-gray-100">
                 <h2 class="font-medium text-gray-800">Upload Terbaru</h2>
             </div>
             <?php if (!empty($my_moduls)): ?>
                 <div class="divide-y divide-gray-100">
-                    <?php foreach (array_slice($my_moduls, 0, 4) as $modul): ?>
+                    <?php foreach (array_slice($my_moduls, 0, 5) as $modul): ?>
                         <div class="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
                             <span class="material-icons-outlined text-gray-400">description</span>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-700 truncate">
                                     <?= htmlspecialchars($modul->judul_modul) ?>
                                 </p>
-                                <p class="text-xs text-gray-500">Pertemuan <?= $modul->pertemuan_ke ?></p>
+                                <p class="text-xs text-gray-500"><?= $modul->nama_matkul ?></p>
                             </div>
-                            <a href="<?= base_url('laboran/modul/edit/' . $modul->id) ?>"
-                                class="text-brown-500 hover:text-brown-600">
-                                <span class="material-icons-outlined text-lg">edit</span>
-                            </a>
                         </div>
                     <?php endforeach; ?>
                 </div>

@@ -5,6 +5,7 @@ class Modul_model extends CI_Model
 {
 
     private $table = 'modul';
+    private $max_slots = 16;
 
     public function __construct()
     {
@@ -12,16 +13,45 @@ class Modul_model extends CI_Model
     }
 
     /**
-     * Get all moduls for a pertemuan
+     * Get all moduls for a matkum
      */
-    public function get_by_pertemuan($pertemuan_id, $visible_only = false)
+    public function get_by_matkul($matkul_id, $visible_only = false)
     {
+        $this->db->select('modul.*, users.nama as uploader_nama');
+        $this->db->from($this->table);
+        $this->db->join('users', 'users.id = modul.uploaded_by', 'left');
+        $this->db->where('id_matkul', $matkul_id);
         if ($visible_only) {
             $this->db->where('is_visible', 1);
         }
-        $this->db->where('id_pertemuan', $pertemuan_id);
-        $this->db->order_by('created_at', 'ASC');
-        return $this->db->get($this->table)->result();
+        $this->db->order_by('slot_number', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Get modul slots with empty placeholders (for UI)
+     */
+    public function get_slots_by_matkul($matkul_id, $num_slots = 16)
+    {
+        $moduls = $this->get_by_matkul($matkul_id);
+        $slots = array();
+
+        // Create slot map
+        $modul_map = array();
+        foreach ($moduls as $modul) {
+            $modul_map[$modul->slot_number] = $modul;
+        }
+
+        // Build slots array with placeholders
+        for ($i = 1; $i <= $num_slots; $i++) {
+            if (isset($modul_map[$i])) {
+                $slots[$i] = $modul_map[$i];
+            } else {
+                $slots[$i] = null; // Empty slot
+            }
+        }
+
+        return $slots;
     }
 
     /**
@@ -37,14 +67,9 @@ class Modul_model extends CI_Model
      */
     public function get_detail($id)
     {
-        $this->db->select('modul.*, pertemuan.pertemuan_ke, pertemuan.judul as pertemuan_judul,
-                          mata_kuliah.nama_matkul, mata_kuliah.kode_matkul,
-                          semester.nama_semester, semester.tahun_ajaran,
-                          users.nama as uploader_nama');
+        $this->db->select('modul.*, mata_kuliah.nama_matkul, mata_kuliah.kode_matkul, users.nama as uploader_nama');
         $this->db->from($this->table);
-        $this->db->join('pertemuan', 'pertemuan.id = modul.id_pertemuan');
-        $this->db->join('mata_kuliah', 'mata_kuliah.id = pertemuan.id_matkul');
-        $this->db->join('semester', 'semester.id = pertemuan.id_semester');
+        $this->db->join('mata_kuliah', 'mata_kuliah.id = modul.id_matkul');
         $this->db->join('users', 'users.id = modul.uploaded_by');
         $this->db->where('modul.id', $id);
         return $this->db->get()->row();
@@ -73,7 +98,6 @@ class Modul_model extends CI_Model
      */
     public function delete($id)
     {
-        // Get file info first
         $modul = $this->get_by_id($id);
         if ($modul && $modul->file_modul) {
             $file_path = FCPATH . 'uploads/modul/' . $modul->file_modul;
@@ -81,9 +105,31 @@ class Modul_model extends CI_Model
                 unlink($file_path);
             }
         }
-
         $this->db->where('id', $id);
         return $this->db->delete($this->table);
+    }
+
+    /**
+     * Check if slot is available
+     */
+    public function is_slot_available($matkul_id, $slot_number)
+    {
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('slot_number', $slot_number);
+        return $this->db->count_all_results($this->table) == 0;
+    }
+
+    /**
+     * Get next available slot
+     */
+    public function get_next_available_slot($matkul_id)
+    {
+        for ($i = 1; $i <= $this->max_slots; $i++) {
+            if ($this->is_slot_available($matkul_id, $i)) {
+                return $i;
+            }
+        }
+        return null; // All slots full
     }
 
     /**
@@ -114,12 +160,9 @@ class Modul_model extends CI_Model
      */
     public function get_recent($limit = 10)
     {
-        $this->db->select('modul.*, pertemuan.pertemuan_ke, mata_kuliah.nama_matkul, 
-                          semester.nama_semester, semester.tahun_ajaran');
+        $this->db->select('modul.*, mata_kuliah.nama_matkul');
         $this->db->from($this->table);
-        $this->db->join('pertemuan', 'pertemuan.id = modul.id_pertemuan');
-        $this->db->join('mata_kuliah', 'mata_kuliah.id = pertemuan.id_matkul');
-        $this->db->join('semester', 'semester.id = pertemuan.id_semester');
+        $this->db->join('mata_kuliah', 'mata_kuliah.id = modul.id_matkul');
         $this->db->where('modul.is_visible', 1);
         $this->db->order_by('modul.created_at', 'DESC');
         $this->db->limit($limit);
@@ -131,31 +174,14 @@ class Modul_model extends CI_Model
      */
     public function get_by_uploader($user_id, $limit = null)
     {
-        $this->db->select('modul.*, pertemuan.pertemuan_ke, mata_kuliah.nama_matkul');
+        $this->db->select('modul.*, mata_kuliah.nama_matkul');
         $this->db->from($this->table);
-        $this->db->join('pertemuan', 'pertemuan.id = modul.id_pertemuan');
-        $this->db->join('mata_kuliah', 'mata_kuliah.id = pertemuan.id_matkul');
+        $this->db->join('mata_kuliah', 'mata_kuliah.id = modul.id_matkul');
         $this->db->where('modul.uploaded_by', $user_id);
         $this->db->order_by('modul.created_at', 'DESC');
         if ($limit) {
             $this->db->limit($limit);
         }
-        return $this->db->get()->result();
-    }
-
-    /**
-     * Get moduls by matkul and uploader
-     */
-    public function get_by_matkul_uploader($matkul_id, $user_id)
-    {
-        $this->db->select('modul.*, pertemuan.pertemuan_ke, mata_kuliah.nama_matkul');
-        $this->db->from($this->table);
-        $this->db->join('pertemuan', 'pertemuan.id = modul.id_pertemuan');
-        $this->db->join('mata_kuliah', 'mata_kuliah.id = pertemuan.id_matkul');
-        $this->db->where('modul.uploaded_by', $user_id);
-        $this->db->where('pertemuan.id_matkul', $matkul_id);
-        $this->db->order_by('pertemuan.pertemuan_ke', 'ASC');
-        $this->db->order_by('modul.created_at', 'DESC');
         return $this->db->get()->result();
     }
 
@@ -168,13 +194,10 @@ class Modul_model extends CI_Model
     }
 
     /**
-     * Count moduls by semester
+     * Count moduls by matkul
      */
-    public function count_by_semester($semester_id)
+    public function count_by_matkul($matkul_id)
     {
-        $this->db->from($this->table);
-        $this->db->join('pertemuan', 'pertemuan.id = modul.id_pertemuan');
-        $this->db->where('pertemuan.id_semester', $semester_id);
-        return $this->db->count_all_results();
+        return $this->db->where('id_matkul', $matkul_id)->count_all_results($this->table);
     }
 }

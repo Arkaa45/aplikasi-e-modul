@@ -3,9 +3,10 @@
     <h1 class="text-xl font-medium text-gray-800">Dashboard Admin</h1>
     <p class="text-sm text-gray-500">
         <?php if (isset($current_semester) && $current_semester): ?>
-            Semester Aktif: <?= $current_semester->nama_semester ?>     <?= $current_semester->tahun_ajaran ?>
+            Semester Saat Ini: <?= $current_semester->nama_semester ?>     <?= $current_semester->tahun_ajaran ?>
+            (<?= $semester_matkum_count ?> Matkum, <?= $semester_mahasiswa_count ?> Mahasiswa)
         <?php else: ?>
-            Belum ada semester aktif
+            Belum ada semester
         <?php endif; ?>
     </p>
 </div>
@@ -51,11 +52,11 @@
     <div class="bg-white rounded-xl border border-gray-200 p-5 card-hover">
         <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
-                <span class="material-icons-outlined text-amber-600">description</span>
+                <span class="material-icons-outlined text-amber-600">menu_book</span>
             </div>
             <div>
                 <p class="text-2xl font-semibold text-gray-800"><?= $total_matkum ?? 0 ?></p>
-                <p class="text-sm text-gray-500">Total Modul</p>
+                <p class="text-sm text-gray-500">Mata Praktikum</p>
             </div>
         </div>
     </div>
@@ -72,11 +73,6 @@
             </h2>
         </div>
         <div class="p-5 space-y-3">
-            <a href="<?= base_url('admin/users/create') ?>"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
-                <span class="material-icons-outlined text-gray-500">person_add</span>
-                <span class="text-sm text-gray-700">Tambah User Baru</span>
-            </a>
             <a href="<?= base_url('admin/semester/create') ?>"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
                 <span class="material-icons-outlined text-gray-500">edit_calendar</span>
@@ -87,17 +83,24 @@
                 <span class="material-icons-outlined text-gray-500">library_add</span>
                 <span class="text-sm text-gray-700">Tambah Mata Praktikum</span>
             </a>
-            <a href="<?= base_url('admin/activity') ?>"
+            <a href="<?= base_url('admin/users/create') ?>"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
-                <span class="material-icons-outlined text-gray-500">history</span>
-                <span class="text-sm text-gray-700">Lihat Log Aktivitas</span>
+                <span class="material-icons-outlined text-gray-500">person_add</span>
+                <span class="text-sm text-gray-700">Tambah User Baru</span>
             </a>
+            <?php if ($current_semester): ?>
+                <a href="<?= base_url('admin/semester/import_mahasiswa/' . $current_semester->id) ?>"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                    <span class="material-icons-outlined text-gray-500">upload_file</span>
+                    <span class="text-sm text-gray-700">Import Mahasiswa (CSV)</span>
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
     <!-- Recent Moduls -->
     <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+        <div class="px-5 py-4 border-b border-gray-100">
             <h2 class="font-medium text-gray-800 flex items-center gap-2">
                 <span class="material-icons-outlined text-lg">schedule</span>
                 Modul Terbaru
@@ -115,7 +118,8 @@
                                 <p class="text-sm font-medium text-gray-800 truncate">
                                     <?= htmlspecialchars($modul->judul_modul) ?>
                                 </p>
-                                <p class="text-xs text-gray-500"><?= htmlspecialchars($modul->nama_matkul) ?></p>
+                                <p class="text-xs text-gray-500"><?= $modul->nama_matkul ?> • Slot <?= $modul->slot_number ?>
+                                </p>
                             </div>
                             <div class="text-right">
                                 <span class="text-xs text-gray-400"><?= date('d M Y', strtotime($modul->created_at)) ?></span>

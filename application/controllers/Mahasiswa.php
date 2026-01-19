@@ -7,210 +7,173 @@ class Mahasiswa extends Mahasiswa_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Matkum_model', 'Pertemuan_model', 'Modul_model', 'Semester_model'));
+        $this->load->model(array('Matkum_model', 'Modul_model', 'Semester_model', 'Rps_model', 'Referensi_model'));
     }
 
     /**
-     * Semester Selection
+     * Dashboard - Semester Selection
      */
-    public function semester()
+    public function index()
     {
         $user_id = $this->session->userdata('user_id');
-        $accessible_semesters = $this->Semester_model->get_accessible();
+        $my_semesters = $this->Semester_model->get_by_mahasiswa($user_id);
 
         $data = array(
-            'title' => 'Pilih Semester',
-            'page_title' => 'Pilih Semester',
-            'semesters' => $accessible_semesters
+            'title' => 'Dashboard Mahasiswa',
+            'page_title' => 'Semester Saya',
+            'semesters' => $my_semesters,
+            'current_semester' => $this->Semester_model->get_latest()
+        );
+
+        $this->load_view('mahasiswa/index', $data);
+    }
+
+    /**
+     * Semester Detail - List Matkum
+     */
+    public function semester($semester_id)
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        // Verify mahasiswa has access
+        if (!$this->Semester_model->is_mahasiswa_enrolled($semester_id, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak terdaftar di semester ini');
+            redirect('mahasiswa');
+        }
+
+        $semester = $this->Semester_model->get_by_id($semester_id);
+        $matkums = $this->Semester_model->get_matkum($semester_id);
+
+        $data = array(
+            'title' => 'Mata Praktikum',
+            'page_title' => $semester->nama_semester . ' ' . $semester->tahun_ajaran,
+            'semester' => $semester,
+            'matkums' => $matkums
         );
 
         $this->load_view('mahasiswa/semester', $data);
     }
 
     /**
-     * Mata Praktikum List for a Semester
+     * Mata Praktikum Detail - View Content
      */
-    public function matkum($semester_id = null)
+    public function matkum($id, $semester_id = null)
     {
         $user_id = $this->session->userdata('user_id');
 
-        // Use active semester if not specified
-        if (!$semester_id) {
-            $active_semester = $this->Semester_model->get_active();
-            if ($active_semester) {
-                $semester_id = $active_semester->id;
-            }
+        // Verify access via semester
+        if ($semester_id && !$this->Semester_model->is_mahasiswa_enrolled($semester_id, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses');
+            redirect('mahasiswa');
         }
 
-        // Check if semester is accessible
-        if (!$this->Semester_model->is_accessible($semester_id)) {
-            $this->session->set_flashdata('error', 'Semester tidak dapat diakses');
-            redirect('mahasiswa/semester');
+        $matkum = $this->Matkum_model->get_with_content_counts($id);
+        if (!$matkum) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('mahasiswa');
         }
-
-        $semester = $this->Semester_model->get_by_id($semester_id);
-        $my_matkum = $this->Matkum_model->get_by_mahasiswa($user_id, $semester_id);
 
         $data = array(
-            'title' => 'Mata Praktikum',
-            'page_title' => 'Mata Praktikum',
-            'semester' => $semester,
-            'matkums' => $my_matkum
+            'title' => $matkum->nama_matkul,
+            'page_title' => $matkum->kode_matkul . ' - ' . $matkum->nama_matkul,
+            'matkum' => $matkum,
+            'semester_id' => $semester_id,
+            'rps_list' => $this->Rps_model->get_by_matkul($id),
+            'referensi_list' => $this->Referensi_model->get_by_matkul($id),
+            'modul_slots' => $this->Modul_model->get_slots_by_matkul($id, 16)
         );
 
         $this->load_view('mahasiswa/matkum', $data);
     }
 
     /**
-     * Pertemuan List for a Mata Kuliah
+     * Download/View Content
      */
-    public function pertemuan($matkum_id)
+    public function download($type, $id)
     {
-        $user_id = $this->session->userdata('user_id');
+        $file_path = null;
+        $file_name = null;
 
-        // Get current or active semester
-        $semester_id = $this->input->get('semester');
-        if (!$semester_id) {
-            $active_semester = $this->Semester_model->get_active();
-            $semester_id = $active_semester ? $active_semester->id : null;
+        switch ($type) {
+            case 'rps':
+                $item = $this->Rps_model->get_by_id($id);
+                if ($item) {
+                    $file_path = FCPATH . 'uploads/rps/' . $item->file_path;
+                    $file_name = $item->judul . '.pdf';
+                }
+                break;
+            case 'referensi':
+                $item = $this->Referensi_model->get_by_id($id);
+                if ($item) {
+                    if ($item->tipe == 'link') {
+                        redirect($item->link_external);
+                    }
+                    $file_path = FCPATH . 'uploads/referensi/' . $item->file_path;
+                    $file_name = $item->judul;
+                }
+                break;
+            case 'modul':
+                $item = $this->Modul_model->get_by_id($id);
+                if ($item) {
+                    if ($item->tipe_file == 'link') {
+                        redirect($item->link_external);
+                    }
+                    $this->Modul_model->increment_download($id);
+                    $file_path = FCPATH . 'uploads/modul/' . $item->file_modul;
+                    $file_name = $item->judul_modul;
+                }
+                break;
         }
 
-        // Check semester accessibility
-        if (!$this->Semester_model->is_accessible($semester_id)) {
-            $this->session->set_flashdata('error', 'Semester tidak dapat diakses');
-            redirect('mahasiswa/semester');
-        }
-
-        $matkum = $this->Matkum_model->get_by_id($matkum_id);
-        $semester = $this->Semester_model->get_by_id($semester_id);
-        $pertemuan = $this->Pertemuan_model->get_by_matkul($matkum_id, $semester_id);
-
-        // Get modul count for each pertemuan
-        foreach ($pertemuan as &$p) {
-            $p->modul_count = count($this->Modul_model->get_by_pertemuan($p->id, true));
-        }
-
-        $data = array(
-            'title' => 'Pertemuan - ' . $matkum->nama_matkul,
-            'page_title' => $matkum->nama_matkul,
-            'matkum' => $matkum,
-            'semester' => $semester,
-            'pertemuan' => $pertemuan
-        );
-
-        $this->load_view('mahasiswa/pertemuan', $data);
-    }
-
-    /**
-     * Modul List for a Pertemuan
-     */
-    public function modul($pertemuan_id)
-    {
-        $pertemuan = $this->Pertemuan_model->get_detail($pertemuan_id);
-
-        if (!$pertemuan) {
-            $this->session->set_flashdata('error', 'Pertemuan tidak ditemukan');
-            redirect('dashboard');
-        }
-
-        // Check semester accessibility
-        if (!$this->Semester_model->is_accessible($pertemuan->id_semester)) {
-            $this->session->set_flashdata('error', 'Modul tidak dapat diakses');
-            redirect('mahasiswa/semester');
-        }
-
-        $moduls = $this->Modul_model->get_by_pertemuan($pertemuan_id, true);
-
-        $data = array(
-            'title' => 'Modul - Pertemuan ' . $pertemuan->pertemuan_ke,
-            'page_title' => 'Pertemuan ' . $pertemuan->pertemuan_ke . ': ' . $pertemuan->judul,
-            'pertemuan' => $pertemuan,
-            'moduls' => $moduls
-        );
-
-        $this->load_view('mahasiswa/modul', $data);
-    }
-
-    /**
-     * Download Modul
-     */
-    public function download($modul_id)
-    {
-        $modul = $this->Modul_model->get_detail($modul_id);
-
-        if (!$modul || !$modul->is_visible) {
-            $this->session->set_flashdata('error', 'Modul tidak ditemukan');
-            redirect('dashboard');
-        }
-
-        // Check semester accessibility
-        $pertemuan = $this->Pertemuan_model->get_by_id($modul->id_pertemuan);
-        if (!$this->Semester_model->is_accessible($pertemuan->id_semester)) {
-            $this->session->set_flashdata('error', 'Modul tidak dapat diakses');
-            redirect('mahasiswa/semester');
-        }
-
-        // Increment download count
-        $this->Modul_model->increment_download($modul_id);
-
-        // Log activity
-        $this->log_activity('download_modul', 'Downloaded: ' . $modul->judul_modul);
-
-        // Handle different file types
-        if ($modul->tipe_file == 'link') {
-            redirect($modul->link_external);
+        if ($file_path && file_exists($file_path)) {
+            $this->load->helper('download');
+            force_download($file_path, NULL);
         } else {
-            $file_path = FCPATH . 'uploads/modul/' . $modul->file_modul;
-
-            if (file_exists($file_path)) {
-                $this->load->helper('download');
-                force_download($file_path, NULL);
-            } else {
-                $this->session->set_flashdata('error', 'File tidak ditemukan');
-                redirect('mahasiswa/modul/' . $modul->id_pertemuan);
-            }
+            $this->session->set_flashdata('error', 'File tidak ditemukan');
+            redirect('mahasiswa');
         }
     }
 
     /**
-     * View Modul (PDF Viewer)
+     * View PDF inline
      */
-    public function view($modul_id)
+    public function view($type, $id)
     {
-        $modul = $this->Modul_model->get_detail($modul_id);
+        $file_path = null;
+        $file_name = null;
 
-        if (!$modul || !$modul->is_visible) {
-            $this->session->set_flashdata('error', 'Modul tidak ditemukan');
-            redirect('dashboard');
+        switch ($type) {
+            case 'rps':
+                $item = $this->Rps_model->get_by_id($id);
+                if ($item) {
+                    $file_path = FCPATH . 'uploads/rps/' . $item->file_path;
+                    $file_name = $item->judul;
+                }
+                break;
+            case 'referensi':
+                $item = $this->Referensi_model->get_by_id($id);
+                if ($item && $item->tipe == 'file') {
+                    $file_path = FCPATH . 'uploads/referensi/' . $item->file_path;
+                    $file_name = $item->judul;
+                }
+                break;
+            case 'modul':
+                $item = $this->Modul_model->get_by_id($id);
+                if ($item && $item->tipe_file == 'pdf') {
+                    $this->Modul_model->increment_download($id);
+                    $file_path = FCPATH . 'uploads/modul/' . $item->file_modul;
+                    $file_name = $item->judul_modul;
+                }
+                break;
         }
 
-        // Check semester accessibility
-        $pertemuan = $this->Pertemuan_model->get_by_id($modul->id_pertemuan);
-        if (!$this->Semester_model->is_accessible($pertemuan->id_semester)) {
-            $this->session->set_flashdata('error', 'Modul tidak dapat diakses');
-            redirect('mahasiswa/semester');
-        }
-
-        // Increment download count (as view)
-        $this->Modul_model->increment_download($modul_id);
-
-        // Handle different file types
-        if ($modul->tipe_file == 'link') {
-            redirect($modul->link_external);
-        } else if ($modul->tipe_file == 'pdf') {
-            $file_path = FCPATH . 'uploads/modul/' . $modul->file_modul;
-
-            if (file_exists($file_path)) {
-                header('Content-Type: application/pdf');
-                header('Content-Disposition: inline; filename="' . $modul->judul_modul . '.pdf"');
-                readfile($file_path);
-            } else {
-                $this->session->set_flashdata('error', 'File tidak ditemukan');
-                redirect('mahasiswa/modul/' . $modul->id_pertemuan);
-            }
+        if ($file_path && file_exists($file_path)) {
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="' . $file_name . '.pdf"');
+            readfile($file_path);
         } else {
-            // For other file types, force download
-            redirect('mahasiswa/download/' . $modul_id);
+            $this->session->set_flashdata('error', 'File tidak ditemukan');
+            redirect('mahasiswa');
         }
     }
 }

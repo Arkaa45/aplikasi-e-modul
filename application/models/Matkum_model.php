@@ -81,20 +81,56 @@ class Matkum_model extends CI_Model
     }
 
     /**
-     * Get mata kuliah for mahasiswa in a semester
+     * Get mata kuliah for a semester
      */
-    public function get_by_mahasiswa($user_id, $semester_id = null)
+    public function get_by_semester($semester_id)
     {
-        $this->db->select('mata_kuliah.*, user_matkul.id_semester');
+        $this->db->select('mata_kuliah.*');
         $this->db->from($this->table);
-        $this->db->join('user_matkul', 'user_matkul.id_matkul = mata_kuliah.id');
-        $this->db->where('user_matkul.id_user', $user_id);
-        if ($semester_id) {
-            $this->db->where('user_matkul.id_semester', $semester_id);
-        }
+        $this->db->join('semester_matkum', 'semester_matkum.id_matkul = mata_kuliah.id');
+        $this->db->where('semester_matkum.id_semester', $semester_id);
         $this->db->where('mata_kuliah.is_active', 1);
         $this->db->order_by('mata_kuliah.kode_matkul', 'ASC');
         return $this->db->get()->result();
+    }
+
+    /**
+     * Assign matkum to semester
+     */
+    public function assign_to_semester($matkul_id, $semester_id)
+    {
+        // Check if already assigned
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('id_semester', $semester_id);
+        if ($this->db->count_all_results('semester_matkum') > 0) {
+            return true; // Already assigned
+        }
+
+        $data = array(
+            'id_matkul' => $matkul_id,
+            'id_semester' => $semester_id
+        );
+        return $this->db->insert('semester_matkum', $data);
+    }
+
+    /**
+     * Remove matkum from semester
+     */
+    public function remove_from_semester($matkul_id, $semester_id)
+    {
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('id_semester', $semester_id);
+        return $this->db->delete('semester_matkum');
+    }
+
+    /**
+     * Check if matkum is in semester
+     */
+    public function is_in_semester($matkul_id, $semester_id)
+    {
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('id_semester', $semester_id);
+        return $this->db->count_all_results('semester_matkum') > 0;
     }
 
     /**
@@ -128,30 +164,6 @@ class Matkum_model extends CI_Model
     }
 
     /**
-     * Enroll mahasiswa to mata kuliah
-     */
-    public function enroll_mahasiswa($matkul_id, $user_id, $semester_id)
-    {
-        $data = array(
-            'id_matkul' => $matkul_id,
-            'id_user' => $user_id,
-            'id_semester' => $semester_id
-        );
-        return $this->db->insert('user_matkul', $data);
-    }
-
-    /**
-     * Unenroll mahasiswa from mata kuliah
-     */
-    public function unenroll_mahasiswa($matkul_id, $user_id, $semester_id)
-    {
-        $this->db->where('id_matkul', $matkul_id);
-        $this->db->where('id_user', $user_id);
-        $this->db->where('id_semester', $semester_id);
-        return $this->db->delete('user_matkul');
-    }
-
-    /**
      * Get all laborans assigned to a mata kuliah
      */
     public function get_laborans_by_matkul($matkul_id)
@@ -172,5 +184,27 @@ class Matkum_model extends CI_Model
         $this->db->where('id_matkul', $matkul_id);
         $this->db->where('id_user', $user_id);
         return $this->db->count_all_results('laboran_matkul') > 0;
+    }
+
+    /**
+     * Get matkum with content counts
+     */
+    public function get_with_content_counts($matkul_id)
+    {
+        $matkum = $this->get_by_id($matkul_id);
+        if ($matkum) {
+            // Count RPS
+            $this->db->where('id_matkul', $matkul_id);
+            $matkum->rps_count = $this->db->count_all_results('matkum_rps');
+
+            // Count Referensi
+            $this->db->where('id_matkul', $matkul_id);
+            $matkum->referensi_count = $this->db->count_all_results('matkum_referensi');
+
+            // Count Modul
+            $this->db->where('id_matkul', $matkul_id);
+            $matkum->modul_count = $this->db->count_all_results('modul');
+        }
+        return $matkum;
     }
 }

@@ -38,6 +38,8 @@ class Dashboard extends MY_Controller
      */
     private function admin_dashboard()
     {
+        $current_semester = $this->Semester_model->get_latest();
+
         $data = array(
             'title' => 'Dashboard Admin',
             'page_title' => 'Dashboard',
@@ -46,7 +48,9 @@ class Dashboard extends MY_Controller
             'total_laboran' => $this->User_model->count_by_role('laboran'),
             'total_matkum' => $this->Matkum_model->count_all(),
             'total_modul' => $this->Modul_model->count_all(),
-            'current_semester' => $this->Semester_model->get_active(),
+            'current_semester' => $current_semester,
+            'semester_matkum_count' => $current_semester ? $this->Semester_model->count_matkum($current_semester->id) : 0,
+            'semester_mahasiswa_count' => $current_semester ? $this->Semester_model->count_mahasiswa($current_semester->id) : 0,
             'recent_moduls' => $this->Modul_model->get_recent(5)
         );
 
@@ -65,7 +69,7 @@ class Dashboard extends MY_Controller
             'page_title' => 'Dashboard',
             'my_matkum' => $this->Matkum_model->get_by_laboran($user_id),
             'my_moduls' => $this->Modul_model->get_by_uploader($user_id, 10),
-            'current_semester' => $this->Semester_model->get_active()
+            'current_semester' => $this->Semester_model->get_latest()
         );
 
         $this->load_view('dashboard/laboran', $data);
@@ -77,14 +81,21 @@ class Dashboard extends MY_Controller
     private function mahasiswa_dashboard()
     {
         $user_id = $this->session->userdata('user_id');
-        $current_semester = $this->Semester_model->get_active();
+        $my_semesters = $this->Semester_model->get_by_mahasiswa($user_id);
+        $current_semester = $this->Semester_model->get_latest();
+
+        // Get matkum from current semester if enrolled
+        $my_matkum = array();
+        if ($current_semester && $this->Semester_model->is_mahasiswa_enrolled($current_semester->id, $user_id)) {
+            $my_matkum = $this->Semester_model->get_matkum($current_semester->id);
+        }
 
         $data = array(
             'title' => 'Dashboard Mahasiswa',
             'page_title' => 'Dashboard',
-            'my_matkum' => $current_semester ? $this->Matkum_model->get_by_mahasiswa($user_id, $current_semester->id) : array(),
+            'my_matkum' => $my_matkum,
             'current_semester' => $current_semester,
-            'accessible_semesters' => $this->Semester_model->get_accessible()
+            'my_semesters' => $my_semesters
         );
 
         $this->load_view('dashboard/mahasiswa', $data);
