@@ -14,6 +14,11 @@
             <span class="material-icons-outlined text-lg">badge</span>
             Assign Laboran
         </a>
+        <a href="<?= base_url('admin/assign_mahasiswa/' . $matkum->id) ?>"
+            class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+            <span class="material-icons-outlined text-lg">school</span>
+            Assign Mahasiswa
+        </a>
         <a href="<?= base_url('admin/matkum/edit/' . $matkum->id) ?>"
             class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
             <span class="material-icons-outlined text-lg">edit</span>
@@ -38,6 +43,25 @@
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+
+<!-- Mahasiswa Info -->
+<div class="mb-4 flex items-center gap-2 text-sm text-gray-600">
+    <span class="material-icons-outlined text-lg">school</span>
+    Mahasiswa Terdaftar:
+    <?php if (!empty($mahasiswas)): ?>
+        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium">
+            <?= count($mahasiswas) ?> orang
+        </span>
+        <a href="<?= base_url('admin/assign_mahasiswa/' . $matkum->id) ?>" class="text-brown-500 hover:underline ml-2">
+            Kelola
+        </a>
+    <?php else: ?>
+        <span class="text-gray-400">Belum ada</span>
+        <a href="<?= base_url('admin/assign_mahasiswa/' . $matkum->id) ?>" class="text-brown-500 hover:underline ml-2">
+            Tambah Mahasiswa
+        </a>
+    <?php endif; ?>
+</div>
 
 <!-- Content Sections -->
 <div class="space-y-4">

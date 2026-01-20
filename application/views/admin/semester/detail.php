@@ -72,13 +72,6 @@
                 Mahasiswa Terdaftar (
                 <?= count($mahasiswas) ?>)
             </h2>
-            <div class="flex gap-2">
-                <a href="<?= base_url('admin/semester/import_mahasiswa/' . $semester->id) ?>"
-                    class="text-sm text-brown-500 hover:text-brown-600 flex items-center gap-1">
-                    <span class="material-icons-outlined text-lg">upload_file</span>
-                    Import CSV
-                </a>
-            </div>
         </div>
         <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
             <?php if (!empty($mahasiswas)): ?>
@@ -93,10 +86,14 @@
                                 <?= htmlspecialchars($mhs->nama) ?>
                             </p>
                             <p class="text-xs text-gray-500">
-                                <?= $mhs->nim_nip ?> -
-                                <?= $mhs->prodi ?>
+                                <?= $mhs->nim_nip ?> - <?= $mhs->prodi ?>
+                                • <span class="text-brown-500 font-medium"><?= $mhs->matkum_count ?> Matkum</span>
                             </p>
                         </div>
+                        <a href="<?= base_url('admin/semester/mahasiswa/' . $semester->id) ?>"
+                            class="text-gray-400 hover:text-brown-500">
+                            <span class="material-icons-outlined text-base">visibility</span>
+                        </a>
                     </div>
                 <?php endforeach; ?>
                 <?php if (count($mahasiswas) > 10): ?>
@@ -109,12 +106,8 @@
             <?php else: ?>
                 <div class="p-8 text-center">
                     <span class="material-icons-outlined text-4xl text-gray-300 mb-2">people</span>
-                    <p class="text-gray-500 text-sm mb-3">Belum ada mahasiswa terdaftar</p>
-                    <a href="<?= base_url('admin/semester/import_mahasiswa/' . $semester->id) ?>"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 text-white text-sm rounded-lg">
-                        <span class="material-icons-outlined text-lg">upload_file</span>
-                        Import dari CSV
-                    </a>
+                    <p class="text-gray-500 text-sm mb-3">Belum ada mahasiswa yang mengambil mata praktikum di semester ini
+                    </p>
                 </div>
             <?php endif; ?>
         </div>

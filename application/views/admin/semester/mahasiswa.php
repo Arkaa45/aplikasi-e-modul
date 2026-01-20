@@ -15,14 +15,6 @@
     </p>
 </div>
 
-<div class="flex gap-4 mb-6">
-    <a href="<?= base_url('admin/semester/import_mahasiswa/' . $semester->id) ?>"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 hover:bg-brown-600 text-white rounded-lg transition">
-        <span class="material-icons-outlined text-lg">upload_file</span>
-        Import dari CSV
-    </a>
-</div>
-
 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
     <div class="px-5 py-4 border-b border-gray-100">
         <h2 class="font-medium text-gray-800">Mahasiswa Terdaftar (
@@ -39,7 +31,7 @@
                         <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIM</th>
                         <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prodi</th>
                         <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase">Angkatan</th>
-                        <th class="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                        <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jml Matkum</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -70,15 +62,10 @@
                             <td class="px-5 py-4 text-sm text-gray-600">
                                 <?= $mhs->angkatan ?>
                             </td>
-                            <td class="px-5 py-4 text-center">
-                                <form method="POST" class="inline"
-                                    onsubmit="return confirm('Hapus mahasiswa dari semester ini?')">
-                                    <input type="hidden" name="action" value="remove">
-                                    <input type="hidden" name="user_id" value="<?= $mhs->id ?>">
-                                    <button type="submit" class="text-red-500 hover:text-red-600">
-                                        <span class="material-icons-outlined">delete</span>
-                                    </button>
-                                </form>
+                            <td class="px-5 py-4 text-sm text-gray-600">
+                                <span class="px-2 py-1 bg-brown-100 text-brown-700 rounded-lg font-medium text-xs">
+                                    <?= $mhs->matkum_count ?> Matkum
+                                </span>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -89,7 +76,8 @@
         <div class="p-12 text-center">
             <span class="material-icons-outlined text-5xl text-gray-300 mb-3">people</span>
             <p class="text-gray-600 font-medium">Belum ada mahasiswa</p>
-            <p class="text-gray-500 text-sm mb-4">Import mahasiswa dari file CSV</p>
+            <p class="text-gray-500 text-sm mb-4">Mahasiswa akan muncul di sini setelah mengambil mata praktikum di semester
+                ini</p>
         </div>
     <?php endif; ?>
 </div>

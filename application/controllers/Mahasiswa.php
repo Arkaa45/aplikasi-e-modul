@@ -11,59 +11,34 @@ class Mahasiswa extends Mahasiswa_Controller
     }
 
     /**
-     * Dashboard - Semester Selection
+     * Dashboard - List Mata Praktikum Saya
      */
     public function index()
     {
         $user_id = $this->session->userdata('user_id');
-        $my_semesters = $this->Semester_model->get_by_mahasiswa($user_id);
+
+        // Get matkum assigned to this mahasiswa
+        $my_matkums = $this->Matkum_model->get_by_mahasiswa($user_id);
 
         $data = array(
             'title' => 'Dashboard Mahasiswa',
-            'page_title' => 'Semester Saya',
-            'semesters' => $my_semesters,
-            'current_semester' => $this->Semester_model->get_latest()
+            'page_title' => 'Mata Praktikum Saya',
+            'matkums' => $my_matkums
         );
 
         $this->load_view('mahasiswa/index', $data);
     }
 
     /**
-     * Semester Detail - List Matkum
-     */
-    public function semester($semester_id)
-    {
-        $user_id = $this->session->userdata('user_id');
-
-        // Verify mahasiswa has access
-        if (!$this->Semester_model->is_mahasiswa_enrolled($semester_id, $user_id)) {
-            $this->session->set_flashdata('error', 'Anda tidak terdaftar di semester ini');
-            redirect('mahasiswa');
-        }
-
-        $semester = $this->Semester_model->get_by_id($semester_id);
-        $matkums = $this->Semester_model->get_matkum($semester_id);
-
-        $data = array(
-            'title' => 'Mata Praktikum',
-            'page_title' => $semester->nama_semester . ' ' . $semester->tahun_ajaran,
-            'semester' => $semester,
-            'matkums' => $matkums
-        );
-
-        $this->load_view('mahasiswa/semester', $data);
-    }
-
-    /**
      * Mata Praktikum Detail - View Content
      */
-    public function matkum($id, $semester_id = null)
+    public function matkum($id)
     {
         $user_id = $this->session->userdata('user_id');
 
-        // Verify access via semester
-        if ($semester_id && !$this->Semester_model->is_mahasiswa_enrolled($semester_id, $user_id)) {
-            $this->session->set_flashdata('error', 'Anda tidak memiliki akses');
+        // Verify mahasiswa has access to this matkum
+        if (!$this->Matkum_model->is_mahasiswa_assigned($id, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses ke mata praktikum ini');
             redirect('mahasiswa');
         }
 
@@ -77,7 +52,6 @@ class Mahasiswa extends Mahasiswa_Controller
             'title' => $matkum->nama_matkul,
             'page_title' => $matkum->kode_matkul . ' - ' . $matkum->nama_matkul,
             'matkum' => $matkum,
-            'semester_id' => $semester_id,
             'rps_list' => $this->Rps_model->get_by_matkul($id),
             'referensi_list' => $this->Referensi_model->get_by_matkul($id),
             'modul_slots' => $this->Modul_model->get_slots_by_matkul($id, 16)

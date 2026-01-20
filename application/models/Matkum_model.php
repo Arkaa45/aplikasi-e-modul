@@ -207,4 +207,64 @@ class Matkum_model extends CI_Model
         }
         return $matkum;
     }
+
+    /**
+     * Assign mahasiswa to mata kuliah
+     */
+    public function assign_mahasiswa($matkul_id, $user_id)
+    {
+        $data = array(
+            'id_matkul' => $matkul_id,
+            'id_user' => $user_id
+        );
+        return $this->db->insert('mahasiswa_matkum', $data);
+    }
+
+    /**
+     * Remove mahasiswa from mata kuliah
+     */
+    public function remove_mahasiswa($matkul_id, $user_id)
+    {
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('id_user', $user_id);
+        return $this->db->delete('mahasiswa_matkum');
+    }
+
+    /**
+     * Get all mahasiswa assigned to a mata kuliah
+     */
+    public function get_mahasiswa_by_matkul($matkul_id)
+    {
+        $this->db->select('users.*');
+        $this->db->from('users');
+        $this->db->join('mahasiswa_matkum', 'mahasiswa_matkum.id_user = users.id');
+        $this->db->where('mahasiswa_matkum.id_matkul', $matkul_id);
+        $this->db->order_by('users.nama', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Check if mahasiswa is assigned to matkul
+     */
+    public function is_mahasiswa_assigned($matkul_id, $user_id)
+    {
+        $this->db->where('id_matkul', $matkul_id);
+        $this->db->where('id_user', $user_id);
+        return $this->db->count_all_results('mahasiswa_matkum') > 0;
+    }
+
+    /**
+     * Get matkum for mahasiswa
+     */
+    public function get_by_mahasiswa($user_id)
+    {
+        $this->db->select('mata_kuliah.*');
+        $this->db->from($this->table);
+        $this->db->join('mahasiswa_matkum', 'mahasiswa_matkum.id_matkul = mata_kuliah.id');
+        $this->db->where('mahasiswa_matkum.id_user', $user_id);
+        $this->db->where('mata_kuliah.is_active', 1);
+        $this->db->order_by('mata_kuliah.kode_matkul', 'ASC');
+        return $this->db->get()->result();
+    }
 }
+

@@ -4,7 +4,7 @@
         <h1 class="text-xl font-medium text-gray-800"><?= $page_title ?></h1>
         <p class="text-sm text-gray-500"><?= $matkum->deskripsi ?? 'Mata Praktikum' ?></p>
     </div>
-    <a href="<?= $semester_id ? base_url('mahasiswa/semester/' . $semester_id) : base_url('mahasiswa') ?>"
+    <a href="<?= base_url('dashboard') ?>"
         class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
         <span class="material-icons-outlined text-lg">arrow_back</span>
         Kembali
@@ -163,7 +163,7 @@
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        <?php
+                            <?php
                         endif;
                     endforeach;
 

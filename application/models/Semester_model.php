@@ -102,65 +102,32 @@ class Semester_model extends CI_Model
     // =====================================================
 
     /**
-     * Get mahasiswa in semester
+     * Get mahasiswa active in semester (based on enrolled matkums)
      */
-    public function get_mahasiswa($semester_id)
+    public function get_mahasiswa_with_matkum_count($semester_id)
     {
-        $this->db->select('users.*');
+        $this->db->select('users.*, COUNT(DISTINCT mahasiswa_matkum.id_matkul) as matkum_count');
         $this->db->from('users');
-        $this->db->join('semester_mahasiswa', 'semester_mahasiswa.id_user = users.id');
-        $this->db->where('semester_mahasiswa.id_semester', $semester_id);
+        $this->db->join('mahasiswa_matkum', 'mahasiswa_matkum.id_user = users.id');
+        $this->db->join('semester_matkum', 'semester_matkum.id_matkul = mahasiswa_matkum.id_matkul');
+        $this->db->where('semester_matkum.id_semester', $semester_id);
         $this->db->where('users.role', 'mahasiswa');
+        $this->db->group_by('users.id');
         $this->db->order_by('users.nama', 'ASC');
         return $this->db->get()->result();
     }
 
     /**
-     * Count mahasiswa in semester
+     * Count mahasiswa in semester (based on enrolled matkums)
      */
     public function count_mahasiswa($semester_id)
     {
-        $this->db->where('id_semester', $semester_id);
-        return $this->db->count_all_results('semester_mahasiswa');
-    }
-
-    /**
-     * Assign mahasiswa to semester
-     */
-    public function assign_mahasiswa($semester_id, $user_id)
-    {
-        // Check if already assigned
-        $this->db->where('id_semester', $semester_id);
-        $this->db->where('id_user', $user_id);
-        if ($this->db->count_all_results('semester_mahasiswa') > 0) {
-            return true; // Already assigned
-        }
-
-        $data = array(
-            'id_semester' => $semester_id,
-            'id_user' => $user_id
-        );
-        return $this->db->insert('semester_mahasiswa', $data);
-    }
-
-    /**
-     * Remove mahasiswa from semester
-     */
-    public function remove_mahasiswa($semester_id, $user_id)
-    {
-        $this->db->where('id_semester', $semester_id);
-        $this->db->where('id_user', $user_id);
-        return $this->db->delete('semester_mahasiswa');
-    }
-
-    /**
-     * Check if mahasiswa is in semester
-     */
-    public function is_mahasiswa_enrolled($semester_id, $user_id)
-    {
-        $this->db->where('id_semester', $semester_id);
-        $this->db->where('id_user', $user_id);
-        return $this->db->count_all_results('semester_mahasiswa') > 0;
+        $this->db->select('COUNT(DISTINCT mahasiswa_matkum.id_user) as count');
+        $this->db->from('mahasiswa_matkum');
+        $this->db->join('semester_matkum', 'semester_matkum.id_matkul = mahasiswa_matkum.id_matkul');
+        $this->db->where('semester_matkum.id_semester', $semester_id);
+        $result = $this->db->get()->row();
+        return $result ? $result->count : 0;
     }
 
     /**
@@ -168,10 +135,12 @@ class Semester_model extends CI_Model
      */
     public function get_by_mahasiswa($user_id)
     {
-        $this->db->select('semester.*');
-        $this->db->from($this->table);
-        $this->db->join('semester_mahasiswa', 'semester_mahasiswa.id_semester = semester.id');
-        $this->db->where('semester_mahasiswa.id_user', $user_id);
+        // Get semesters where mahasiswa has at least one matkum assigned
+        $this->db->select('DISTINCT semester.*');
+        $this->db->from('semester');
+        $this->db->join('semester_matkum', 'semester_matkum.id_semester = semester.id');
+        $this->db->join('mahasiswa_matkum', 'mahasiswa_matkum.id_matkul = semester_matkum.id_matkul');
+        $this->db->where('mahasiswa_matkum.id_user', $user_id);
         $this->db->order_by('semester.tahun_ajaran', 'DESC');
         $this->db->order_by('semester.nama_semester', 'DESC');
         return $this->db->get()->result();

@@ -133,9 +133,6 @@ class Admin extends Admin_Controller
             case 'mahasiswa':
                 $this->semester_mahasiswa($id);
                 break;
-            case 'import_mahasiswa':
-                $this->semester_import_mahasiswa($id);
-                break;
             default:
                 $this->semester_list();
         }
@@ -197,7 +194,7 @@ class Admin extends Admin_Controller
             'page_title' => $semester->nama_semester . ' ' . $semester->tahun_ajaran,
             'semester' => $semester,
             'matkums' => $this->Semester_model->get_matkum($id),
-            'mahasiswas' => $this->Semester_model->get_mahasiswa($id)
+            'mahasiswas' => $this->Semester_model->get_mahasiswa_with_matkum_count($id)
         );
 
         $this->load_view('admin/semester/detail', $data);
@@ -251,98 +248,14 @@ class Admin extends Admin_Controller
             redirect('admin/semester');
         }
 
-        if ($this->input->post()) {
-            $action = $this->input->post('action');
-            $user_id = $this->input->post('user_id');
-
-            if ($action == 'remove') {
-                $this->Semester_model->remove_mahasiswa($id, $user_id);
-                $this->session->set_flashdata('success', 'Mahasiswa berhasil dihapus dari semester');
-            }
-            redirect('admin/semester/mahasiswa/' . $id);
-        }
-
         $data = array(
             'title' => 'Mahasiswa Semester',
             'page_title' => 'Mahasiswa - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
             'semester' => $semester,
-            'mahasiswas' => $this->Semester_model->get_mahasiswa($id)
+            'mahasiswas' => $this->Semester_model->get_mahasiswa_with_matkum_count($id)
         );
 
         $this->load_view('admin/semester/mahasiswa', $data);
-    }
-
-    private function semester_import_mahasiswa($id)
-    {
-        $semester = $this->Semester_model->get_by_id($id);
-        if (!$semester) {
-            $this->session->set_flashdata('error', 'Semester tidak ditemukan');
-            redirect('admin/semester');
-        }
-
-        if ($this->input->post() && !empty($_FILES['csv_file']['name'])) {
-            $file = $_FILES['csv_file']['tmp_name'];
-
-            if (($handle = fopen($file, "r")) !== FALSE) {
-                $header = fgetcsv($handle); // Skip header row
-                $imported = 0;
-                $skipped = 0;
-                $default_password = 'password123';
-
-                while (($row = fgetcsv($handle)) !== FALSE) {
-                    if (count($row) >= 5) {
-                        $nama = trim($row[0]);
-                        $email = trim($row[1]);
-                        $nim = trim($row[2]);
-                        $prodi = trim($row[3]);
-                        $angkatan = trim($row[4]);
-
-                        // Check if user exists
-                        $existing = $this->User_model->get_by_email($email);
-
-                        if ($existing) {
-                            // Just assign to semester
-                            if ($existing->role == 'mahasiswa') {
-                                $this->Semester_model->assign_mahasiswa($id, $existing->id);
-                                $imported++;
-                            } else {
-                                $skipped++;
-                            }
-                        } else {
-                            // Create new user
-                            $user_data = array(
-                                'nama' => $nama,
-                                'email' => $email,
-                                'password' => $default_password,
-                                'role' => 'mahasiswa',
-                                'nim_nip' => $nim,
-                                'prodi' => $prodi,
-                                'angkatan' => $angkatan,
-                                'is_active' => 1
-                            );
-                            $user_id = $this->User_model->create($user_data);
-                            $this->Semester_model->assign_mahasiswa($id, $user_id);
-                            $imported++;
-                        }
-                    }
-                }
-                fclose($handle);
-
-                $this->log_activity('import_mahasiswa', "Imported $imported mahasiswa to semester");
-                $this->session->set_flashdata('success', "Berhasil import $imported mahasiswa. $skipped dilewati.");
-            } else {
-                $this->session->set_flashdata('error', 'Gagal membaca file CSV');
-            }
-            redirect('admin/semester/mahasiswa/' . $id);
-        }
-
-        $data = array(
-            'title' => 'Import Mahasiswa',
-            'page_title' => 'Import Mahasiswa - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
-            'semester' => $semester
-        );
-
-        $this->load_view('admin/semester/import_mahasiswa', $data);
     }
 
     private function semester_delete($id)
@@ -446,7 +359,8 @@ class Admin extends Admin_Controller
             'rps_list' => $this->Rps_model->get_by_matkul($id),
             'referensi_list' => $this->Referensi_model->get_by_matkul($id),
             'modul_slots' => $this->Modul_model->get_slots_by_matkul($id, 16),
-            'laborans' => $this->Matkum_model->get_laborans_by_matkul($id)
+            'laborans' => $this->Matkum_model->get_laborans_by_matkul($id),
+            'mahasiswas' => $this->Matkum_model->get_mahasiswa_by_matkul($id)
         );
 
         $this->load_view('admin/matkum/detail', $data);
@@ -514,6 +428,59 @@ class Admin extends Admin_Controller
         );
 
         $this->load_view('admin/matkum/assign_laboran', $data);
+    }
+
+    /**
+     * Assign Mahasiswa to Mata Praktikum
+     */
+    public function assign_mahasiswa($matkum_id = null)
+    {
+        if (!$matkum_id) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($matkum_id);
+        if (!$matkum) {
+            $this->session->set_flashdata('error', 'Mata praktikum tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        if ($this->input->post()) {
+            $mahasiswa_id = $this->input->post('mahasiswa_id');
+            $action = $this->input->post('action');
+
+            if ($action == 'assign') {
+                if (!$this->Matkum_model->is_mahasiswa_assigned($matkum_id, $mahasiswa_id)) {
+                    $this->Matkum_model->assign_mahasiswa($matkum_id, $mahasiswa_id);
+                    $this->log_activity('assign_mahasiswa', 'Assigned mahasiswa to: ' . $matkum->nama_matkul);
+                    $this->session->set_flashdata('success', 'Mahasiswa berhasil ditambahkan');
+                }
+            } else if ($action == 'remove') {
+                $this->Matkum_model->remove_mahasiswa($matkum_id, $mahasiswa_id);
+                $this->log_activity('remove_mahasiswa', 'Removed mahasiswa from: ' . $matkum->nama_matkul);
+                $this->session->set_flashdata('success', 'Mahasiswa berhasil dihapus dari mata praktikum');
+            }
+
+            redirect('admin/assign_mahasiswa/' . $matkum_id);
+        }
+
+        $all_mahasiswa = $this->User_model->get_all('mahasiswa', 1);
+        $assigned_mahasiswa = $this->Matkum_model->get_mahasiswa_by_matkul($matkum_id);
+        $assigned_ids = array_map(function ($m) {
+            return $m->id;
+        }, $assigned_mahasiswa);
+
+        $data = array(
+            'title' => 'Assign Mahasiswa',
+            'page_title' => 'Assign Mahasiswa - ' . $matkum->nama_matkul,
+            'matkum' => $matkum,
+            'all_mahasiswa' => $all_mahasiswa,
+            'assigned_mahasiswa' => $assigned_mahasiswa,
+            'assigned_ids' => $assigned_ids
+        );
+
+        $this->load_view('admin/matkum/assign_mahasiswa', $data);
     }
 
     /**

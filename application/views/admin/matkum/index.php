@@ -48,7 +48,8 @@
                                 </a>
                                 <?php if ($matkum->deskripsi): ?>
                                     <p class="text-xs text-gray-500 mt-1">
-                                        <?= htmlspecialchars(substr($matkum->deskripsi, 0, 50)) ?>            <?= strlen($matkum->deskripsi) > 50 ? '...' : '' ?>
+                                        <?= htmlspecialchars(substr($matkum->deskripsi, 0, 50)) ?>
+                                        <?= strlen($matkum->deskripsi) > 50 ? '...' : '' ?>
                                     </p>
                                 <?php endif; ?>
                             </td>
@@ -87,6 +88,10 @@
                                     <a href="<?= base_url('admin/assign_laboran/' . $matkum->id) ?>"
                                         class="p-2 hover:bg-green-50 rounded-full" title="Assign Laboran">
                                         <span class="material-icons-outlined text-green-600 text-lg">person_add</span>
+                                    </a>
+                                    <a href="<?= base_url('admin/assign_mahasiswa/' . $matkum->id) ?>"
+                                        class="p-2 hover:bg-blue-50 rounded-full" title="Assign Mahasiswa">
+                                        <span class="material-icons-outlined text-blue-600 text-lg">school</span>
                                     </a>
                                     <a href="<?= base_url('admin/matkum/edit/' . $matkum->id) ?>"
                                         class="p-2 hover:bg-gray-100 rounded-full" title="Edit">

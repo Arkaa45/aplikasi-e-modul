@@ -81,21 +81,14 @@ class Dashboard extends MY_Controller
     private function mahasiswa_dashboard()
     {
         $user_id = $this->session->userdata('user_id');
-        $my_semesters = $this->Semester_model->get_by_mahasiswa($user_id);
-        $current_semester = $this->Semester_model->get_latest();
 
-        // Get matkum from current semester if enrolled
-        $my_matkum = array();
-        if ($current_semester && $this->Semester_model->is_mahasiswa_enrolled($current_semester->id, $user_id)) {
-            $my_matkum = $this->Semester_model->get_matkum($current_semester->id);
-        }
+        // Get matkum assigned to this mahasiswa via mahasiswa_matkum table
+        $my_matkum = $this->Matkum_model->get_by_mahasiswa($user_id);
 
         $data = array(
             'title' => 'Dashboard Mahasiswa',
-            'page_title' => 'Dashboard',
-            'my_matkum' => $my_matkum,
-            'current_semester' => $current_semester,
-            'my_semesters' => $my_semesters
+            'page_title' => 'Mata Praktikum Saya',
+            'matkums' => $my_matkum
         );
 
         $this->load_view('dashboard/mahasiswa', $data);
