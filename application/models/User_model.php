@@ -118,4 +118,12 @@ class User_model extends CI_Model
         $this->db->order_by('nama', 'ASC');
         return $this->db->get($this->table)->result();
     }
+
+    /**
+     * Get user by NIM/NIP
+     */
+    public function get_by_nim_nip($nim_nip)
+    {
+        return $this->db->get_where($this->table, array('nim_nip' => $nim_nip))->row();
+    }
 }

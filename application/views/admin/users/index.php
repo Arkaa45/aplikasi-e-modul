@@ -4,11 +4,18 @@
         <h1 class="text-xl font-medium text-gray-800"><?= $page_title ?></h1>
         <p class="text-sm text-gray-500">Kelola data pengguna sistem</p>
     </div>
-    <a href="<?= base_url('admin/users/create') ?>"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 hover:bg-brown-600 text-white rounded-lg transition">
-        <span class="material-icons-outlined text-lg">person_add</span>
-        Tambah User
-    </a>
+    <div class="flex items-center gap-2">
+        <a href="<?= base_url('admin/users/import') ?>"
+            class="inline-flex items-center gap-2 px-4 py-2 border border-brown-500 text-brown-600 hover:bg-brown-50 rounded-lg transition">
+            <span class="material-icons-outlined text-lg">upload_file</span>
+            Import CSV
+        </a>
+        <a href="<?= base_url('admin/users/create') ?>"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-brown-500 hover:bg-brown-600 text-white rounded-lg transition">
+            <span class="material-icons-outlined text-lg">person_add</span>
+            Tambah User
+        </a>
+    </div>
 </div>
 
 <!-- Filter -->

@@ -28,6 +28,12 @@ class Admin extends Admin_Controller
             case 'toggle':
                 $this->user_toggle($id);
                 break;
+            case 'import':
+                $this->user_import();
+                break;
+            case 'download_template':
+                $this->download_csv_template();
+                break;
             default:
                 $this->user_list();
         }
@@ -107,6 +113,226 @@ class Admin extends Admin_Controller
             $this->session->set_flashdata('success', 'Status user berhasil diubah');
         }
         redirect('admin/users');
+    }
+
+    /**
+     * Import users from CSV
+     */
+    private function user_import()
+    {
+        if ($this->input->post()) {
+            $import_type = $this->input->post('import_type');
+            $content = '';
+
+            // Get content based on import type
+            if ($import_type === 'paste') {
+                // Paste data method
+                $content = $this->input->post('csv_data');
+                if (empty(trim($content))) {
+                    $this->session->set_flashdata('error', 'Silakan masukkan data CSV');
+                    redirect('admin/users/import');
+                }
+            } else {
+                // File upload method
+                if (empty($_FILES['csv_file']['name'])) {
+                    $this->session->set_flashdata('error', 'Silakan pilih file CSV');
+                    redirect('admin/users/import');
+                }
+
+                $file = $_FILES['csv_file'];
+
+                // Validate file extension
+                $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                if ($ext !== 'csv') {
+                    $this->session->set_flashdata('error', 'File harus berformat CSV');
+                    redirect('admin/users/import');
+                }
+
+                // Read file content
+                $content = file_get_contents($file['tmp_name']);
+            }
+
+            // Remove UTF-8 BOM if present
+            $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+            // Normalize line endings
+            $content = str_replace("\r\n", "\n", $content);
+            $content = str_replace("\r", "\n", $content);
+
+            // Detect delimiter (comma or semicolon)
+            $first_line = strtok($content, "\n");
+            $delimiter = (substr_count($first_line, ';') > substr_count($first_line, ',')) ? ';' : ',';
+
+            // Parse CSV from string
+            $lines = explode("\n", $content);
+            if (count($lines) < 2) {
+                $this->session->set_flashdata('error', 'File CSV kosong atau hanya berisi header');
+                redirect('admin/users/import');
+            }
+
+            // Read header
+            $header = str_getcsv($lines[0], $delimiter);
+            if (!$header || count($header) < 3) {
+                $this->session->set_flashdata('error', 'Header CSV tidak valid. Pastikan ada kolom: nama, email, nim_nip');
+                redirect('admin/users/import');
+            }
+
+            // Normalize header (trim and lowercase)
+            $header = array_map(function ($col) {
+                return strtolower(trim($col));
+            }, $header);
+
+            // Validate required columns
+            $required_columns = ['nama', 'email', 'nim_nip'];
+            $missing_columns = array_diff($required_columns, $header);
+            if (!empty($missing_columns)) {
+                $this->session->set_flashdata('error', 'Kolom yang diperlukan tidak ditemukan: ' . implode(', ', $missing_columns));
+                redirect('admin/users/import');
+            }
+
+            // Get column indexes
+            $col_indexes = array_flip($header);
+
+            // Process rows
+            $success_count = 0;
+            $error_count = 0;
+            $errors = [];
+            $row_num = 1; // Header is row 1
+            $total_rows = 0;
+
+            for ($i = 1; $i < count($lines); $i++) {
+                $line = trim($lines[$i]);
+
+                // Skip empty lines
+                if (empty($line)) {
+                    continue;
+                }
+
+                $total_rows++;
+                $row_num = $i + 1;
+                $row = str_getcsv($line, $delimiter);
+
+                // Get values
+                $nama = isset($col_indexes['nama']) && isset($row[$col_indexes['nama']])
+                    ? trim($row[$col_indexes['nama']]) : '';
+                $email = isset($col_indexes['email']) && isset($row[$col_indexes['email']])
+                    ? trim($row[$col_indexes['email']]) : '';
+                $nim_nip = isset($col_indexes['nim_nip']) && isset($row[$col_indexes['nim_nip']])
+                    ? trim($row[$col_indexes['nim_nip']]) : '';
+                $prodi = isset($col_indexes['prodi']) && isset($row[$col_indexes['prodi']])
+                    ? trim($row[$col_indexes['prodi']]) : '';
+                $angkatan = isset($col_indexes['angkatan']) && isset($row[$col_indexes['angkatan']])
+                    ? trim($row[$col_indexes['angkatan']]) : '';
+
+                // Validate required fields
+                if (empty($nama)) {
+                    $errors[] = "Baris $row_num: Nama tidak boleh kosong";
+                    $error_count++;
+                    continue;
+                }
+                if (empty($email)) {
+                    $errors[] = "Baris $row_num: Email tidak boleh kosong";
+                    $error_count++;
+                    continue;
+                }
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Baris $row_num: Format email tidak valid ($email)";
+                    $error_count++;
+                    continue;
+                }
+                if (empty($nim_nip)) {
+                    $errors[] = "Baris $row_num: NIM/NIP tidak boleh kosong";
+                    $error_count++;
+                    continue;
+                }
+
+                // Check for duplicate email
+                if ($this->User_model->get_by_email($email)) {
+                    $errors[] = "Baris $row_num: Email sudah terdaftar ($email)";
+                    $error_count++;
+                    continue;
+                }
+
+                // Check for duplicate NIM/NIP
+                if ($this->User_model->get_by_nim_nip($nim_nip)) {
+                    $errors[] = "Baris $row_num: NIM/NIP sudah terdaftar ($nim_nip)";
+                    $error_count++;
+                    continue;
+                }
+
+                // Create user data
+                $user_data = array(
+                    'nama' => $nama,
+                    'email' => $email,
+                    'password' => $nim_nip, // Password = NIM/NIP
+                    'role' => 'mahasiswa',
+                    'nim_nip' => $nim_nip,
+                    'prodi' => $prodi,
+                    'angkatan' => $angkatan ? $angkatan : null,
+                    'is_active' => 1
+                );
+
+                // Insert user
+                if ($this->User_model->create($user_data)) {
+                    $success_count++;
+                } else {
+                    $errors[] = "Baris $row_num: Gagal menyimpan data ($nama)";
+                    $error_count++;
+                }
+            }
+
+            // Set flash messages
+            if ($success_count > 0) {
+                $this->session->set_flashdata('success', "$success_count user mahasiswa berhasil ditambahkan");
+                $this->log_activity('import_users', "Imported $success_count mahasiswa from CSV");
+            }
+            if ($error_count > 0) {
+                $this->session->set_flashdata('import_errors', $errors);
+                $this->session->set_flashdata('error', "$error_count data gagal diimport");
+            }
+            if ($success_count == 0 && $error_count == 0) {
+                if ($total_rows == 0) {
+                    $this->session->set_flashdata('error', 'Tidak ada data yang ditemukan dalam file CSV. Pastikan format sudah benar.');
+                } else {
+                    $this->session->set_flashdata('error', 'Tidak ada data yang berhasil diproses. Periksa format CSV Anda.');
+                }
+            }
+
+            redirect('admin/users/import');
+        }
+
+        $data = array(
+            'title' => 'Import User Mahasiswa',
+            'page_title' => 'Import User Mahasiswa dari CSV'
+        );
+
+        $this->load_view('admin/users/import', $data);
+    }
+
+    /**
+     * Download CSV template for user import
+     */
+    private function download_csv_template()
+    {
+        $filename = 'template_import_mahasiswa.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+
+        // Add BOM for UTF-8
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        // Header row
+        fputcsv($output, ['nama', 'email', 'nim_nip', 'prodi', 'angkatan']);
+
+        // Example rows
+        fputcsv($output, ['Ahmad Fauzi', 'ahmad@student.ac.id', '2023001001', 'Teknik Informatika', '2023']);
+        fputcsv($output, ['Siti Aminah', 'siti@student.ac.id', '2023001002', 'Sistem Informasi', '2023']);
+
+        fclose($output);
+        exit;
     }
 
     /**
