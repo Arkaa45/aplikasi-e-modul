@@ -66,6 +66,18 @@ class MY_Controller extends CI_Controller
         $data['current_page'] = $this->router->fetch_class();
         $data['current_method'] = $this->router->fetch_method();
 
+        // Load sidebar matkum data for laboran and mahasiswa
+        $role = $this->session->userdata('role');
+        $user_id = $this->session->userdata('user_id');
+        if ($role == 'laboran' || $role == 'mahasiswa') {
+            $this->load->model('Matkum_model');
+            if ($role == 'laboran') {
+                $data['sidebar_matkums'] = $this->Matkum_model->get_by_laboran($user_id);
+            } else {
+                $data['sidebar_matkums'] = $this->Matkum_model->get_by_mahasiswa($user_id);
+            }
+        }
+
         $this->load->view('layout/header', $data);
         $this->load->view('layout/sidebar', $data);
         $this->load->view($view, $data);

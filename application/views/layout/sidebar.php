@@ -52,20 +52,46 @@
                 <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Mata Praktikum Saya</p>
             </div>
             <div class="px-3 space-y-1">
-                <p class="px-3 py-2 text-xs text-gray-500">
-                    Klik mata praktikum dari dashboard untuk mengelola konten
-                </p>
+                <?php if (!empty($sidebar_matkums)): ?>
+                    <?php foreach ($sidebar_matkums as $matkum): ?>
+                        <a href="<?= base_url('laboran/matkum/' . $matkum->id) ?>"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'laboran/matkum/' . $matkum->id) !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
+                            <span class="material-icons-outlined text-xl">menu_book</span>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate"><?= htmlspecialchars($matkum->nama_matkul) ?></p>
+                                <p class="text-xs text-gray-400"><?= $matkum->kode_matkul ?></p>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="px-3 py-2 text-xs text-gray-500">
+                        Belum ada mata praktikum yang ditugaskan
+                    </p>
+                <?php endif; ?>
             </div>
 
         <?php elseif ($role == 'mahasiswa'): ?>
             <!-- Mahasiswa Menu -->
             <div class="px-3 pt-4 pb-2">
-                <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Semester Saya</p>
+                <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Mata Praktikum Saya</p>
             </div>
             <div class="px-3 space-y-1">
-                <p class="px-3 py-2 text-xs text-gray-500">
-                    Pilih semester dari dashboard untuk mengakses mata praktikum
-                </p>
+                <?php if (!empty($sidebar_matkums)): ?>
+                    <?php foreach ($sidebar_matkums as $matkum): ?>
+                        <a href="<?= base_url('mahasiswa/matkum/' . $matkum->id) ?>"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'mahasiswa/matkum/' . $matkum->id) !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
+                            <span class="material-icons-outlined text-xl">menu_book</span>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate"><?= htmlspecialchars($matkum->nama_matkul) ?></p>
+                                <p class="text-xs text-gray-400"><?= $matkum->kode_matkul ?></p>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="px-3 py-2 text-xs text-gray-500">
+                        Belum terdaftar di mata praktikum
+                    </p>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
