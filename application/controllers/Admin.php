@@ -7,7 +7,7 @@ class Admin extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('User_model', 'Semester_model', 'Matkum_model', 'Modul_model', 'Rps_model', 'Referensi_model'));
+        $this->load->model(array('User_model', 'Matkum_model', 'Modul_model', 'Rps_model', 'Referensi_model'));
     }
 
     /**
@@ -336,163 +336,6 @@ class Admin extends Admin_Controller
     }
 
     /**
-     * Semester Management
-     */
-    public function semester($action = 'index', $id = null)
-    {
-        switch ($action) {
-            case 'create':
-                $this->semester_form();
-                break;
-            case 'edit':
-                $this->semester_form($id);
-                break;
-            case 'delete':
-                $this->semester_delete($id);
-                break;
-            case 'detail':
-                $this->semester_detail($id);
-                break;
-            case 'assign_matkum':
-                $this->semester_assign_matkum($id);
-                break;
-            case 'mahasiswa':
-                $this->semester_mahasiswa($id);
-                break;
-            default:
-                $this->semester_list();
-        }
-    }
-
-    private function semester_list()
-    {
-        $data = array(
-            'title' => 'Kelola Semester',
-            'page_title' => 'Kelola Semester',
-            'semesters' => $this->Semester_model->get_all_with_counts()
-        );
-
-        $this->load_view('admin/semester/index', $data);
-    }
-
-    private function semester_form($id = null)
-    {
-        if ($this->input->post()) {
-            $semester_data = array(
-                'nama_semester' => $this->input->post('nama_semester', TRUE),
-                'tahun_ajaran' => $this->input->post('tahun_ajaran', TRUE),
-                'tanggal_mulai' => $this->input->post('tanggal_mulai'),
-                'tanggal_selesai' => $this->input->post('tanggal_selesai')
-            );
-
-            if ($id) {
-                $this->Semester_model->update($id, $semester_data);
-                $this->log_activity('update_semester', 'Updated semester');
-                $this->session->set_flashdata('success', 'Semester berhasil diperbarui');
-            } else {
-                $id = $this->Semester_model->create($semester_data);
-                $this->log_activity('create_semester', 'Created new semester');
-                $this->session->set_flashdata('success', 'Semester berhasil ditambahkan');
-            }
-            redirect('admin/semester/detail/' . $id);
-        }
-
-        $data = array(
-            'title' => $id ? 'Edit Semester' : 'Tambah Semester',
-            'page_title' => $id ? 'Edit Semester' : 'Tambah Semester',
-            'semester_data' => $id ? $this->Semester_model->get_by_id($id) : null,
-            'edit_mode' => $id ? true : false
-        );
-
-        $this->load_view('admin/semester/form', $data);
-    }
-
-    private function semester_detail($id)
-    {
-        $semester = $this->Semester_model->get_with_counts($id);
-        if (!$semester) {
-            $this->session->set_flashdata('error', 'Semester tidak ditemukan');
-            redirect('admin/semester');
-        }
-
-        $data = array(
-            'title' => 'Detail Semester',
-            'page_title' => $semester->nama_semester . ' ' . $semester->tahun_ajaran,
-            'semester' => $semester,
-            'matkums' => $this->Semester_model->get_matkum($id),
-            'mahasiswas' => $this->Semester_model->get_mahasiswa_with_matkum_count($id)
-        );
-
-        $this->load_view('admin/semester/detail', $data);
-    }
-
-    private function semester_assign_matkum($id)
-    {
-        $semester = $this->Semester_model->get_by_id($id);
-        if (!$semester) {
-            $this->session->set_flashdata('error', 'Semester tidak ditemukan');
-            redirect('admin/semester');
-        }
-
-        if ($this->input->post()) {
-            $action = $this->input->post('action');
-            $matkul_id = $this->input->post('matkul_id');
-
-            if ($action == 'assign') {
-                $this->Matkum_model->assign_to_semester($matkul_id, $id);
-                $this->session->set_flashdata('success', 'Mata praktikum berhasil ditambahkan');
-            } else if ($action == 'remove') {
-                $this->Matkum_model->remove_from_semester($matkul_id, $id);
-                $this->session->set_flashdata('success', 'Mata praktikum berhasil dihapus');
-            }
-            redirect('admin/semester/assign_matkum/' . $id);
-        }
-
-        // Get all matkum and mark which are assigned
-        $all_matkum = $this->Matkum_model->get_all(1);
-        $assigned_matkum = $this->Semester_model->get_matkum($id);
-        $assigned_ids = array_map(function ($m) {
-            return $m->id;
-        }, $assigned_matkum);
-
-        $data = array(
-            'title' => 'Assign Mata Praktikum',
-            'page_title' => 'Assign Mata Praktikum - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
-            'semester' => $semester,
-            'all_matkum' => $all_matkum,
-            'assigned_ids' => $assigned_ids
-        );
-
-        $this->load_view('admin/semester/assign_matkum', $data);
-    }
-
-    private function semester_mahasiswa($id)
-    {
-        $semester = $this->Semester_model->get_by_id($id);
-        if (!$semester) {
-            $this->session->set_flashdata('error', 'Semester tidak ditemukan');
-            redirect('admin/semester');
-        }
-
-        $data = array(
-            'title' => 'Mahasiswa Semester',
-            'page_title' => 'Mahasiswa - ' . $semester->nama_semester . ' ' . $semester->tahun_ajaran,
-            'semester' => $semester,
-            'mahasiswas' => $this->Semester_model->get_mahasiswa_with_matkum_count($id)
-        );
-
-        $this->load_view('admin/semester/mahasiswa', $data);
-    }
-
-    private function semester_delete($id)
-    {
-        $this->Semester_model->delete($id);
-        $this->log_activity('delete_semester', 'Deleted semester');
-        $this->session->set_flashdata('success', 'Semester berhasil dihapus');
-        redirect('admin/semester');
-    }
-
-    /**
      * Mata Praktikum Management
      */
     public function matkum($action = 'index', $id = null)
@@ -693,6 +536,7 @@ class Admin extends Admin_Controller
 
         $all_mahasiswa = $this->User_model->get_all('mahasiswa', 1);
         $assigned_mahasiswa = $this->Matkum_model->get_mahasiswa_by_matkul($matkum_id);
+        $angkatan_list = $this->User_model->get_distinct_angkatan();
         $assigned_ids = array_map(function ($m) {
             return $m->id;
         }, $assigned_mahasiswa);
@@ -703,7 +547,8 @@ class Admin extends Admin_Controller
             'matkum' => $matkum,
             'all_mahasiswa' => $all_mahasiswa,
             'assigned_mahasiswa' => $assigned_mahasiswa,
-            'assigned_ids' => $assigned_ids
+            'assigned_ids' => $assigned_ids,
+            'angkatan_list' => $angkatan_list
         );
 
         $this->load_view('admin/matkum/assign_mahasiswa', $data);
@@ -877,6 +722,183 @@ class Admin extends Admin_Controller
         } else {
             redirect('admin/matkum');
         }
+    }
+
+    /**
+     * Edit Modul
+     */
+    public function edit_modul($id)
+    {
+        $modul = $this->Modul_model->get_detail($id);
+
+        if (!$modul) {
+            $this->session->set_flashdata('error', 'Modul tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        if ($this->input->post()) {
+            $modul_data = array(
+                'judul_modul' => $this->input->post('judul_modul', TRUE),
+                'deskripsi' => $this->input->post('deskripsi', TRUE),
+                'tipe_file' => $this->input->post('tipe_file', TRUE),
+                'link_external' => $this->input->post('link_external', TRUE),
+                'is_visible' => $this->input->post('is_visible') ? 1 : 0
+            );
+
+            // Handle file upload if new file provided
+            if (!empty($_FILES['file_modul']['name'])) {
+                $upload = $this->do_upload('file_modul', 'modul');
+                if ($upload['success']) {
+                    // Delete old file
+                    if ($modul->file_modul) {
+                        $old_file = FCPATH . 'uploads/modul/' . $modul->file_modul;
+                        if (file_exists($old_file)) {
+                            unlink($old_file);
+                        }
+                    }
+                    $modul_data['file_modul'] = $upload['file_name'];
+                } else {
+                    $this->session->set_flashdata('error', $upload['error']);
+                    redirect('admin/edit_modul/' . $id);
+                }
+            }
+
+            $this->Modul_model->update($id, $modul_data);
+            $this->log_activity('update_modul', 'Updated modul: ' . $modul_data['judul_modul']);
+            $this->session->set_flashdata('success', 'Modul berhasil diperbarui');
+            redirect('admin/matkum/detail/' . $modul->id_matkul);
+        }
+
+        $data = array(
+            'title' => 'Edit Modul',
+            'page_title' => 'Edit Modul',
+            'modul' => $modul
+        );
+
+        $this->load_view('admin/matkum/edit_modul', $data);
+    }
+
+    /**
+     * Edit RPS
+     */
+    public function edit_rps($id)
+    {
+        $rps = $this->Rps_model->get_by_id($id);
+
+        if (!$rps) {
+            $this->session->set_flashdata('error', 'RPS tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        if ($this->input->post()) {
+            $rps_data = array(
+                'judul' => $this->input->post('judul', TRUE)
+            );
+
+            // Handle file upload if new file provided
+            if (!empty($_FILES['file']['name'])) {
+                $upload = $this->do_upload('file', 'rps');
+                if ($upload['success']) {
+                    // Delete old file
+                    if ($rps->file_path) {
+                        $old_file = FCPATH . 'uploads/rps/' . $rps->file_path;
+                        if (file_exists($old_file)) {
+                            unlink($old_file);
+                        }
+                    }
+                    $rps_data['file_path'] = $upload['file_name'];
+                } else {
+                    $this->session->set_flashdata('error', $upload['error']);
+                    redirect('admin/edit_rps/' . $id);
+                }
+            }
+
+            $this->Rps_model->update($id, $rps_data);
+            $this->log_activity('update_rps', 'Updated RPS: ' . $rps_data['judul']);
+            $this->session->set_flashdata('success', 'RPS berhasil diperbarui');
+            redirect('admin/matkum/detail/' . $rps->id_matkul);
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($rps->id_matkul);
+
+        $data = array(
+            'title' => 'Edit RPS',
+            'page_title' => 'Edit RPS',
+            'rps' => $rps,
+            'matkum' => $matkum
+        );
+
+        $this->load_view('admin/matkum/edit_rps', $data);
+    }
+
+    /**
+     * Edit Referensi
+     */
+    public function edit_referensi($id)
+    {
+        $referensi = $this->Referensi_model->get_by_id($id);
+
+        if (!$referensi) {
+            $this->session->set_flashdata('error', 'Referensi tidak ditemukan');
+            redirect('admin/matkum');
+        }
+
+        if ($this->input->post()) {
+            $tipe = $this->input->post('tipe');
+            $referensi_data = array(
+                'judul' => $this->input->post('judul', TRUE),
+                'deskripsi' => $this->input->post('deskripsi', TRUE),
+                'tipe' => $tipe
+            );
+
+            if ($tipe == 'file') {
+                // Handle file upload if new file provided
+                if (!empty($_FILES['file']['name'])) {
+                    $upload = $this->do_upload('file', 'referensi');
+                    if ($upload['success']) {
+                        // Delete old file if exists
+                        if ($referensi->file_path) {
+                            $old_file = FCPATH . 'uploads/referensi/' . $referensi->file_path;
+                            if (file_exists($old_file)) {
+                                unlink($old_file);
+                            }
+                        }
+                        $referensi_data['file_path'] = $upload['file_name'];
+                    } else {
+                        $this->session->set_flashdata('error', $upload['error']);
+                        redirect('admin/edit_referensi/' . $id);
+                    }
+                }
+                $referensi_data['link_external'] = null;
+            } else {
+                // Link type
+                $referensi_data['link_external'] = $this->input->post('link_external', TRUE);
+                // Delete old file if switching from file to link
+                if ($referensi->file_path) {
+                    $old_file = FCPATH . 'uploads/referensi/' . $referensi->file_path;
+                    if (file_exists($old_file)) {
+                        unlink($old_file);
+                    }
+                }
+                $referensi_data['file_path'] = null;
+            }
+
+            $this->Referensi_model->update($id, $referensi_data);
+            $this->log_activity('update_referensi', 'Updated Referensi: ' . $referensi_data['judul']);
+            $this->session->set_flashdata('success', 'Referensi berhasil diperbarui');
+            redirect('admin/matkum/detail/' . $referensi->id_matkul);
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($referensi->id_matkul);
+
+        $data = array(
+            'title' => 'Edit Referensi',
+            'page_title' => 'Edit Referensi',
+            'referensi' => $referensi,
+            'matkum' => $matkum
+        );
+
+        $this->load_view('admin/matkum/edit_referensi', $data);
     }
 
     /**

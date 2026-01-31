@@ -102,6 +102,10 @@
                                     class="p-2 text-gray-500 hover:text-brown-500">
                                     <span class="material-icons-outlined">visibility</span>
                                 </a>
+                                <a href="<?= base_url('admin/edit_rps/' . $rps->id) ?>"
+                                    class="p-2 text-gray-500 hover:text-brown-500">
+                                    <span class="material-icons-outlined">edit</span>
+                                </a>
                                 <a href="<?= base_url('admin/delete_content/rps/' . $rps->id) ?>"
                                     class="p-2 text-gray-500 hover:text-red-500" data-confirm-delete>
                                     <span class="material-icons-outlined">delete</span>
@@ -166,6 +170,10 @@
                                         <span class="material-icons-outlined">visibility</span>
                                     </a>
                                 <?php endif; ?>
+                                <a href="<?= base_url('admin/edit_referensi/' . $ref->id) ?>"
+                                    class="p-2 text-gray-500 hover:text-brown-500">
+                                    <span class="material-icons-outlined">edit</span>
+                                </a>
                                 <a href="<?= base_url('admin/delete_content/referensi/' . $ref->id) ?>"
                                     class="p-2 text-gray-500 hover:text-red-500" data-confirm-delete>
                                     <span class="material-icons-outlined">delete</span>
@@ -238,6 +246,10 @@
                                             <span class="material-icons-outlined">visibility</span>
                                         </a>
                                     <?php endif; ?>
+                                    <a href="<?= base_url('admin/edit_modul/' . $modul->id) ?>"
+                                        class="p-2 text-gray-500 hover:text-brown-500">
+                                        <span class="material-icons-outlined">edit</span>
+                                    </a>
                                     <a href="<?= base_url('admin/delete_content/modul/' . $modul->id) ?>"
                                         class="p-2 text-gray-500 hover:text-red-500" data-confirm-delete>
                                         <span class="material-icons-outlined">delete</span>

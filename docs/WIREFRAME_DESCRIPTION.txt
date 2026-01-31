@@ -1,0 +1,262 @@
+================================================================================
+              PENJELASAN WIREFRAME APLIKASI E-MODUL PRAKTIKUM
+================================================================================
+
+Dokumen ini menjelaskan alasan dan tujuan perancangan setiap halaman dalam 
+aplikasi E-Modul Praktikum. Setiap wireframe dirancang berdasarkan kebutuhan
+pengguna dan prinsip user experience yang baik.
+
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. HALAMAN LOGIN
+--------------------------------------------------------------------------------
+File: wireframe_login_1769740214393.png
+
+Halaman login dirancang sebagai pintu gerbang keamanan aplikasi yang memastikan
+hanya pengguna terdaftar yang dapat mengakses sistem. Perancangan halaman ini
+bertujuan untuk mengimplementasikan Role-Based Access Control (RBAC), di mana
+sistem akan mengarahkan pengguna ke dashboard yang sesuai berdasarkan role
+mereka (Admin, Laboran, atau Mahasiswa) setelah berhasil login. Tanpa halaman
+ini, tidak ada mekanisme untuk membedakan hak akses antar pengguna.
+
+Desain yang minimalis dipilih agar pengguna dapat fokus pada proses autentikasi
+tanpa distraksi. Hal ini juga mempercepat loading halaman dan memudahkan
+pengguna yang mengakses dari perangkat dengan koneksi terbatas. Form yang
+sederhana dengan hanya dua field (email dan password) mengurangi friction
+dalam proses login sehari-hari.
+
+
+--------------------------------------------------------------------------------
+2. DASHBOARD ADMIN
+--------------------------------------------------------------------------------
+File: wireframe_dashboard_admin_1769740237036.png
+
+Dashboard Admin dirancang untuk memberikan gambaran menyeluruh tentang kondisi
+sistem kepada Kepala Laboratorium. Halaman ini diperlukan karena admin perlu
+memantau statistik penting seperti jumlah modul, mahasiswa, laboran, dan mata
+praktikum secara real-time tanpa harus membuka banyak halaman. Dengan satu
+pandangan, admin dapat mengidentifikasi apakah ada anomali atau hal yang
+memerlukan perhatian segera.
+
+Fitur "Quick Actions" dirancang untuk mengakomodasi tugas-tugas yang paling
+sering dilakukan admin, seperti membuat modul baru atau menambah pengguna.
+Dengan menempatkan aksi-aksi ini di halaman utama, admin tidak perlu melakukan
+navigasi berulang yang membuang waktu. Section "Recent Modules" menampilkan
+aktivitas terbaru agar admin dapat memantau perkembangan konten tanpa harus
+masuk ke halaman detail masing-masing mata praktikum.
+
+
+--------------------------------------------------------------------------------
+3. DASHBOARD LABORAN
+--------------------------------------------------------------------------------
+File: dasboard.jpeg
+
+Dashboard Laboran dirancang dengan filosofi "fokus pada tugas utama". Berbeda
+dengan admin yang perlu melihat keseluruhan sistem, laboran hanya memerlukan
+akses ke mata praktikum yang menjadi tanggung jawabnya. Halaman ini menjawab
+kebutuhan laboran untuk segera mengetahui mata praktikum mana yang perlu
+dikelola dan berapa banyak modul yang sudah tersedia di setiap mata praktikum.
+
+Tampilan kartu untuk setiap mata praktikum dipilih agar informasi mudah
+di-scan secara visual. Jumlah modul ditampilkan langsung di kartu sehingga
+laboran dapat memprioritaskan mata praktikum yang belum lengkap modulnya.
+Tombol "Kelola" yang langsung tersedia di setiap kartu memungkinkan akses
+cepat tanpa langkah navigasi tambahan, menghemat waktu laboran yang sibuk.
+
+
+--------------------------------------------------------------------------------
+4. DASHBOARD MAHASISWA
+--------------------------------------------------------------------------------
+File: wireframe_dashboard_mhs_1769795100499.png
+
+Dashboard Mahasiswa dirancang dengan mengutamakan kemudahan akses materi
+pembelajaran. Halaman ini menjadi pusat navigasi bagi mahasiswa untuk menemukan
+dan mengakses semua modul praktikum yang mereka ikuti. Permasalahan yang
+diselesaikan adalah kebutuhan mahasiswa untuk mengakses materi dengan cepat
+kapan saja dan di mana saja, baik untuk persiapan praktikum maupun review
+materi setelah praktikum.
+
+Tampilan grid kartu visual dipilih agar mahasiswa dapat dengan mudah mengenali
+mata praktikum berdasarkan kode dan nama. Sidebar navigasi menampilkan daftar
+mata praktikum yang diikuti, memberikan alternatif navigasi yang lebih cepat.
+Fitur "Download Offline" dan "Akses Mobile" diinformasikan di halaman ini
+untuk memberitahu mahasiswa bahwa mereka dapat belajar bahkan tanpa koneksi
+internet, menjawab kebutuhan fleksibilitas pembelajaran modern.
+
+
+--------------------------------------------------------------------------------
+5. KELOLA USER
+--------------------------------------------------------------------------------
+File: wireframe_manage_users_1769740256105.png
+
+Halaman Kelola User dirancang untuk memenuhi kebutuhan admin dalam mengelola
+seluruh pengguna sistem secara terpusat. Dalam konteks laboratorium, pengguna
+terus bertambah setiap semester (mahasiswa baru) dan perlu dikelola statusnya
+(alumni, mahasiswa aktif, laboran yang berganti). Tanpa halaman ini, admin
+akan kesulitan melacak siapa saja yang memiliki akses ke sistem.
+
+Fitur filter berdasarkan role sangat penting karena jumlah pengguna bisa
+mencapai ratusan. Admin dapat dengan cepat melihat hanya daftar mahasiswa,
+atau hanya laboran, sesuai kebutuhan. Kolom status (aktif/nonaktif) memungkinkan
+admin menonaktifkan akun tanpa menghapusnya, sehingga data historis tetap
+terjaga. Tombol aksi langsung di setiap baris mempercepat operasi edit dan
+hapus tanpa perlu berpindah halaman.
+
+
+--------------------------------------------------------------------------------
+6. FORM TAMBAH USER
+--------------------------------------------------------------------------------
+File: wireframe_usr_form_1769795174785.png
+
+Form Tambah User dirancang untuk menyediakan antarmuka yang jelas dan mencegah
+kesalahan input saat admin mendaftarkan pengguna baru. Setiap field dirancang
+sesuai dengan kebutuhan data minimal yang diperlukan sistem: identitas (nama,
+email), keamanan (password), identifikasi akademik (NIM/NIP), dan hak akses
+(role). Checkbox status aktif memungkinkan admin membuat akun terlebih dahulu
+sebelum mengaktifkannya.
+
+Panel informasi di sisi kanan yang menjelaskan hak akses setiap role adalah
+fitur penting untuk mencegah kesalahan penugasan role. Admin perlu memahami
+bahwa memilih role "Admin" akan memberikan akses penuh ke seluruh sistem,
+sedangkan "Mahasiswa" hanya dapat mengakses modul. Penjelasan ini mengurangi
+risiko pemberian hak akses yang tidak sesuai yang dapat menimbulkan masalah
+keamanan atau operasional.
+
+
+--------------------------------------------------------------------------------
+7. IMPORT USER CSV
+--------------------------------------------------------------------------------
+File: wireframe_import_csv_1769795122370.png
+
+Halaman Import CSV dirancang untuk mengatasi masalah penambahan data mahasiswa
+secara massal saat awal semester. Mendaftarkan ratusan mahasiswa satu per satu
+melalui form individual akan sangat tidak efisien dan memakan waktu berhari-hari.
+Dengan fitur import CSV, admin dapat mengunggah data puluhan mahasiswa sekaligus
+dalam hitungan menit menggunakan data yang biasanya sudah tersedia dari sistem
+akademik universitas.
+
+Dua metode input (paste data dan upload file) disediakan untuk mengakomodasi
+berbagai skenario. Paste data berguna untuk jumlah kecil atau testing, sedangkan
+upload file untuk data lengkap satu angkatan. Petunjuk import dan tabel format
+kolom yang ditampilkan langsung di halaman bertujuan mengurangi kesalahan format
+yang akan menimbulkan kegagalan import. Tombol download template memastikan
+admin memiliki contoh format yang benar.
+
+
+--------------------------------------------------------------------------------
+8. KELOLA MATA PRAKTIKUM
+--------------------------------------------------------------------------------
+File: kelola matkum.png
+
+Halaman Kelola Mata Praktikum dirancang sebagai pusat manajemen seluruh mata
+praktikum dalam sistem. Admin perlu melihat gambaran lengkap: mata praktikum
+apa saja yang ada, siapa laboran yang ditugaskan, dan berapa mahasiswa yang
+terdaftar di setiap mata praktikum. Informasi ini penting untuk perencanaan
+beban kerja laboran dan alokasi sumber daya laboratorium.
+
+Kolom "Assignment" yang menampilkan laboran yang ditugaskan membantu admin
+memastikan tidak ada mata praktikum yang terabaikan (tanpa laboran). Kolom
+"Student Count" memberikan gambaran popularitas atau kebutuhan setiap mata
+praktikum. Dengan semua informasi ini dalam satu tabel, admin dapat membuat
+keputusan manajerial seperti penambahan laboran untuk mata praktikum dengan
+banyak mahasiswa atau penggabungan mata praktikum dengan peserta sedikit.
+
+
+--------------------------------------------------------------------------------
+9. FORM TAMBAH MATA PRAKTIKUM
+--------------------------------------------------------------------------------
+File: wireframe_course_form_1769795078216.png
+
+Form Tambah Mata Praktikum dirancang untuk memudahkan pendefinisian mata
+praktikum baru dalam sistem. Field-field yang dipilih (Kode, Nama, SKS,
+Deskripsi) merupakan informasi standar yang diperlukan dalam sistem akademik.
+Kode mata praktikum bersifat unik dan digunakan sebagai identifier, sedangkan
+nama memberikan deskripsi yang mudah dibaca manusia.
+
+Checkbox "Mata Praktikum Aktif" memberikan fleksibilitas untuk menyiapkan
+mata praktikum sebelum semester dimulai tanpa membuatnya langsung terlihat
+oleh mahasiswa. Admin dapat mengatur seluruh mata praktikum dan kontennya
+terlebih dahulu, kemudian mengaktifkannya secara bersamaan saat semester
+dimulai. Ini memastikan kesiapan sistem dan konsistensi pengalaman mahasiswa.
+
+
+--------------------------------------------------------------------------------
+10. DETAIL MATA PRAKTIKUM
+--------------------------------------------------------------------------------
+File: detail matkum.png
+
+Halaman Detail Mata Praktikum dirancang sebagai workspace utama untuk pengelolaan
+konten pembelajaran dalam satu mata praktikum. Halaman ini menggabungkan tiga
+jenis konten (RPS, Referensi, Modul) dalam satu tempat agar laboran tidak perlu
+berpindah-pindah halaman saat menyusun materi. Struktur 16 slot modul mengikuti
+standar jumlah pertemuan dalam satu semester akademik.
+
+Pemisahan konten menjadi tiga section (RPS, Referensi, Modul) mencerminkan
+hierarki materi pembelajaran. RPS di bagian atas karena merupakan dokumen
+induk yang menjelaskan keseluruhan rencana pembelajaran. Referensi sebagai
+materi pendukung, dan Modul sebagai materi utama per pertemuan. Tab "Mahasiswa"
+memungkinkan pengecekan cepat siapa saja yang terdaftar tanpa meninggalkan
+konteks mata praktikum yang sedang dikelola.
+
+
+--------------------------------------------------------------------------------
+11. LOG AKTIVITAS
+--------------------------------------------------------------------------------
+File: wireframe_log_1769795150887.png
+
+Halaman Log Aktivitas dirancang untuk memenuhi kebutuhan audit dan keamanan
+sistem. Dalam lingkungan akademik, penting untuk dapat melacak siapa melakukan
+apa dan kapan untuk keperluan akuntabilitas. Jika terjadi masalah seperti
+kehilangan data atau akses tidak sah, admin dapat menelusuri log untuk
+investigasi dan perbaikan.
+
+Kolom IP Address dicatat untuk keamanan tambahan - admin dapat mendeteksi jika
+ada akun yang diakses dari lokasi yang tidak biasa yang mungkin mengindikasikan
+pembobolan akun. Tampilan role (Admin/Laboran/Mahasiswa) menggunakan badge
+berwarna untuk memudahkan identifikasi visual. Log ini juga berguna untuk
+memantau aktivitas laboran, memastikan mereka aktif mengupload dan memperbarui
+modul sesuai jadwal yang ditentukan.
+
+
+--------------------------------------------------------------------------------
+12. FORM UPLOAD MODUL
+--------------------------------------------------------------------------------
+File: wireframe_upload_modul.png
+
+Halaman Upload Modul dirancang sebagai antarmuka utama bagi laboran untuk
+mengunggah materi pembelajaran ke dalam sistem. Halaman ini menjawab kebutuhan
+dalam proses distribusi materi praktikum, di mana laboran perlu mengunggah
+berbagai jenis file (PDF, video, atau link) ke slot pertemuan yang tepat.
+Tanpa halaman ini, tidak ada cara terstruktur untuk memasukkan konten
+pembelajaran ke dalam sistem secara konsisten.
+
+Field "Slot Modul" dengan dropdown berisi 16 slot pertemuan dirancang untuk
+memastikan modul ditempatkan pada pertemuan yang benar sesuai jadwal semester.
+Field "Judul Modul" dan "Deskripsi" memungkinkan laboran memberikan konteks
+yang jelas tentang isi materi, membantu mahasiswa memahami relevansi modul
+sebelum mengunduhnya. Dropdown "Tipe File" dirancang untuk mengakomodasi
+berbagai format materi pembelajaran: PDF untuk dokumen, Video untuk tutorial,
+dan Link untuk sumber eksternal seperti YouTube atau website referensi.
+
+Checkbox "Tampilkan ke mahasiswa" adalah fitur krusial yang memberikan kontrol
+visibilitas modul. Laboran dapat mengunggah modul terlebih dahulu sebagai draft
+tanpa langsung menampilkannya ke mahasiswa, kemudian mengaktifkannya saat waktu
+yang tepat (misalnya saat pertemuan tersebut dimulai). Ini mencegah mahasiswa
+mengakses materi terlalu dini dan memastikan urutan pembelajaran yang terstruktur.
+Tombol "Upload" dan "Batal" ditempatkan jelas di bagian bawah form untuk konfirmasi
+aksi pengguna.
+
+
+================================================================================
+                              PENUTUP
+================================================================================
+
+Setiap wireframe dirancang berdasarkan analisis kebutuhan pengguna dan best
+practice dalam desain antarmuka. Perancangan mengutamakan efisiensi kerja
+pengguna, kejelasan informasi, dan kemudahan navigasi. Wireframe ini menjadi
+panduan pengembangan untuk memastikan aplikasi yang dibangun benar-benar
+menjawab kebutuhan pengelolaan modul praktikum di lingkungan laboratorium.
+
+================================================================================

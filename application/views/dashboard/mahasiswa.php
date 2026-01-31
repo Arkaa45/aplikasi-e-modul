@@ -48,7 +48,7 @@
         <span class="material-icons-outlined text-3xl text-brown-500 mb-2">smartphone</span>
         <h3 class="font-medium text-gray-800">Akses Mobile</h3>
         <p class="text-sm text-gray-600">Buka dari smartphone</p>
-        <p class="text-sm text-gray-600">(SEGERA HADIR)</p>
+        <p class="text-sm text-gray-600">(SEGERA HADIR)</p> 
     </div>
     <div class="bg-cream-100 rounded-xl p-5 text-center">
         <span class="material-icons-outlined text-3xl text-brown-500 mb-2">download</span>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 20, 2026 at 05:28 AM
+-- Generation Time: Jan 29, 2026 at 03:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -108,7 +108,46 @@ INSERT INTO `activity_log` (`id`, `id_user`, `action`, `description`, `ip_addres
 (64, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:15:03'),
 (65, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:15:13'),
 (66, 2, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:21:33'),
-(67, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:21:51');
+(67, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:21:51'),
+(68, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:58:06'),
+(69, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 04:58:16'),
+(70, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 05:06:02'),
+(71, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 05:06:29'),
+(72, 1, 'import_users', 'Imported 3 mahasiswa from CSV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 05:10:23'),
+(73, 6, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-20 05:11:46'),
+(74, 6, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-20 05:14:28'),
+(75, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-20 05:14:37'),
+(76, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 05:19:55'),
+(77, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 05:20:01'),
+(78, 2, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 05:21:21'),
+(79, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:31:25'),
+(80, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:31:33'),
+(81, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:31:46'),
+(82, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:43:10'),
+(83, 2, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:44:46'),
+(84, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:44:56'),
+(85, 1, 'create_semester', 'Created new semester', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 07:49:23'),
+(86, 2, 'upload_modul', 'Uploaded Modul slot 3', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 08:00:43'),
+(87, 2, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 08:02:27'),
+(88, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 08:03:04'),
+(89, 3, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 08:03:10'),
+(90, 3, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-20 08:10:25'),
+(91, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-23 00:09:47'),
+(92, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Linux; Android 8.0.0; SM-G955U Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36', '2026-01-23 00:11:08'),
+(93, 3, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Linux; Android 8.0.0; SM-G955U Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36', '2026-01-23 00:11:18'),
+(94, 3, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-23 00:11:51'),
+(95, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-23 09:29:38'),
+(96, 1, 'upload_modul', 'Uploaded Modul slot 4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-23 09:31:52'),
+(97, 1, 'delete_modul', 'Deleted Modul', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-23 09:33:06'),
+(98, 1, 'upload_modul', 'Uploaded Modul slot 1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-23 09:33:41'),
+(99, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0', '2026-01-23 09:35:25'),
+(100, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:19:47'),
+(101, 1, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:20:50'),
+(102, 2, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:21:16'),
+(103, 2, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:23:50'),
+(104, 3, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:24:11'),
+(105, 3, 'logout', 'User logged out', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:24:40'),
+(106, 1, 'login', 'User logged in', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-29 02:25:12');
 
 -- --------------------------------------------------------
 
@@ -253,64 +292,9 @@ CREATE TABLE `modul` (
 
 INSERT INTO `modul` (`id`, `id_matkul`, `slot_number`, `judul_modul`, `deskripsi`, `tipe_file`, `file_modul`, `link_external`, `uploaded_by`, `is_visible`, `download_count`, `created_at`, `updated_at`) VALUES
 (6, 5, 2, 'Pertemuan 2', '', 'pdf', 'e7593b3a065b9890676ae15fd3198d24.pdf', NULL, 1, 1, 1, '2026-01-19 15:38:28', '2026-01-19 16:58:23'),
-(7, 5, 1, 'Pertemuan 1', '', 'pdf', '01c67777a354a0a56d5b63ae2c34aed0.pdf', NULL, 1, 1, 3, '2026-01-19 15:39:49', '2026-01-19 16:58:21');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `semester`
---
-
-CREATE TABLE `semester` (
-  `id` int(11) NOT NULL,
-  `nama_semester` varchar(50) NOT NULL,
-  `tahun_ajaran` varchar(20) NOT NULL,
-  `tanggal_mulai` date NOT NULL,
-  `tanggal_selesai` date NOT NULL,
-  `is_active` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `semester`
---
-
-INSERT INTO `semester` (`id`, `nama_semester`, `tahun_ajaran`, `tanggal_mulai`, `tanggal_selesai`, `is_active`, `created_at`, `updated_at`) VALUES
-(4, 'Ganjil', '2025/2026', '2025-09-15', '2026-02-19', 0, '2026-01-19 14:50:12', '2026-01-19 14:50:12');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `semester_mahasiswa`
---
-
-CREATE TABLE `semester_mahasiswa` (
-  `id` int(11) NOT NULL,
-  `id_semester` int(11) NOT NULL,
-  `id_user` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `semester_matkum`
---
-
-CREATE TABLE `semester_matkum` (
-  `id` int(11) NOT NULL,
-  `id_semester` int(11) NOT NULL,
-  `id_matkul` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `semester_matkum`
---
-
-INSERT INTO `semester_matkum` (`id`, `id_semester`, `id_matkul`, `created_at`) VALUES
-(9, 4, 5, '2026-01-19 15:40:49');
+(8, 5, 3, '3', '', 'pdf', 'ddf0d40366964356d3e6d9761d7e05bc.pdf', NULL, 2, 1, 0, '2026-01-20 08:00:43', '2026-01-20 08:00:43'),
+(9, 5, 4, '4', '', 'pdf', '707fe63c086d428269ddba9e8ac2fc53.pdf', NULL, 1, 1, 0, '2026-01-23 09:31:52', '2026-01-23 09:31:52'),
+(10, 5, 1, 'Mengelola file dan folder secara terstruktur menggunakan File Explorer, termasuk membuat, menyalin, memindahkan, mengganti nama, dan mengompres file.', '', 'pdf', '8306e65fa98453b0b27b8db797746eca.pdf', NULL, 1, 1, 0, '2026-01-23 09:33:41', '2026-01-23 09:33:41');
 
 -- --------------------------------------------------------
 
@@ -342,7 +326,10 @@ INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `nim_nip`, `prod
 (2, 'Budi Santoso', 'laboran@lab.ac.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'laboran', '199001152015041002', NULL, NULL, NULL, 1, '2026-01-19 09:30:43', '2026-01-19 09:30:43'),
 (3, 'Ahmad Maulana', 'mhs@student.ac.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'mahasiswa', '2021001001', 'Teknik Informatika', '2021', NULL, 1, '2026-01-19 09:30:43', '2026-01-19 09:30:43'),
 (4, 'Siti Nurhaliza', 'siti@student.ac.id', '$2y$10$I.nWQHMOgVkMRcQj1oP.XuwFVyPZk1OECuJzILirYTqkkcsc6D69u', 'mahasiswa', '2021001002', 'Teknik Informatika', '2021', NULL, 1, '2026-01-19 09:30:43', '2026-01-19 15:45:51'),
-(5, 'Rizki Pratama', 'rizki@student.ac.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'mahasiswa', '2022001001', 'Sistem Informasi', '2022', NULL, 1, '2026-01-19 09:30:43', '2026-01-19 09:30:43');
+(5, 'Rizki Pratama', 'rizki@student.ac.id', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'mahasiswa', '2022001001', 'Sistem Informasi', '2022', NULL, 1, '2026-01-19 09:30:43', '2026-01-19 09:30:43'),
+(6, 'Andi Pratama', 'andi.pratama@student.ac.id', '$2y$10$.Q.bj.ahIpiuOqQNeBDNBepeLozkV8b2YowzDStLZanyg2GV4Mcte', 'mahasiswa', '2024001001', 'Teknik Informatika', '2024', NULL, 1, '2026-01-20 05:10:23', '2026-01-20 05:10:23'),
+(7, 'Dewi Lestari', 'dewi.lestari@student.ac.id', '$2y$10$Snc45zH6y.D8wcPNkbpai.VVfIooEKktoUQVMr1l.WpbUn3uyl4wy', 'mahasiswa', '2024001002', 'Sistem Informasi', '2024', NULL, 1, '2026-01-20 05:10:23', '2026-01-20 05:10:23'),
+(8, 'Budi Hartono', 'budi.hartono@student.ac.id', '$2y$10$1ydgh1D8.KrILjz4BAUPkOuldkDw1HXXMh9yTD0FGUoYMsdokxE42', 'mahasiswa', '2024001003', 'Teknik Informatika', '2024', NULL, 1, '2026-01-20 05:10:23', '2026-01-20 05:10:23');
 
 --
 -- Indexes for dumped tables
@@ -403,28 +390,6 @@ ALTER TABLE `modul`
   ADD KEY `uploaded_by` (`uploaded_by`);
 
 --
--- Indexes for table `semester`
---
-ALTER TABLE `semester`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `semester_mahasiswa`
---
-ALTER TABLE `semester_mahasiswa`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_semester_mahasiswa` (`id_semester`,`id_user`),
-  ADD KEY `id_user` (`id_user`);
-
---
--- Indexes for table `semester_matkum`
---
-ALTER TABLE `semester_matkum`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_semester_matkul` (`id_semester`,`id_matkul`),
-  ADD KEY `id_matkul` (`id_matkul`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -439,7 +404,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT for table `laboran_matkul`
@@ -475,31 +440,13 @@ ALTER TABLE `matkum_rps`
 -- AUTO_INCREMENT for table `modul`
 --
 ALTER TABLE `modul`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `semester`
---
-ALTER TABLE `semester`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `semester_mahasiswa`
---
-ALTER TABLE `semester_mahasiswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `semester_matkum`
---
-ALTER TABLE `semester_matkum`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -545,20 +492,6 @@ ALTER TABLE `matkum_rps`
 ALTER TABLE `modul`
   ADD CONSTRAINT `modul_ibfk_1` FOREIGN KEY (`id_matkul`) REFERENCES `mata_kuliah` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `modul_ibfk_2` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `semester_mahasiswa`
---
-ALTER TABLE `semester_mahasiswa`
-  ADD CONSTRAINT `semester_mahasiswa_ibfk_1` FOREIGN KEY (`id_semester`) REFERENCES `semester` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `semester_mahasiswa_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `semester_matkum`
---
-ALTER TABLE `semester_matkum`
-  ADD CONSTRAINT `semester_matkum_ibfk_1` FOREIGN KEY (`id_semester`) REFERENCES `semester` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `semester_matkum_ibfk_2` FOREIGN KEY (`id_matkul`) REFERENCES `mata_kuliah` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

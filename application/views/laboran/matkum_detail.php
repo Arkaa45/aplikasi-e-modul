@@ -49,6 +49,10 @@
                                     class="p-2 text-gray-500 hover:text-brown-500">
                                     <span class="material-icons-outlined">visibility</span>
                                 </a>
+                                <a href="<?= base_url('laboran/edit_rps/' . $rps->id) ?>"
+                                    class="p-2 text-gray-500 hover:text-brown-500">
+                                    <span class="material-icons-outlined">edit</span>
+                                </a>
                                 <a href="<?= base_url('laboran/delete/rps/' . $rps->id) ?>"
                                     class="p-2 text-gray-500 hover:text-red-500" data-confirm-delete>
                                     <span class="material-icons-outlined">delete</span>
@@ -108,6 +112,10 @@
                                         <span class="material-icons-outlined">visibility</span>
                                     </a>
                                 <?php endif; ?>
+                                <a href="<?= base_url('laboran/edit_referensi/' . $ref->id) ?>"
+                                    class="p-2 text-gray-500 hover:text-brown-500">
+                                    <span class="material-icons-outlined">edit</span>
+                                </a>
                                 <a href="<?= base_url('laboran/delete/referensi/' . $ref->id) ?>"
                                     class="p-2 text-gray-500 hover:text-red-500" data-confirm-delete>
                                     <span class="material-icons-outlined">delete</span>

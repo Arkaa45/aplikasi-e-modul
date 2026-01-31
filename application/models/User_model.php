@@ -126,4 +126,18 @@ class User_model extends CI_Model
     {
         return $this->db->get_where($this->table, array('nim_nip' => $nim_nip))->row();
     }
+
+    /**
+     * Get distinct angkatan list for mahasiswa
+     */
+    public function get_distinct_angkatan()
+    {
+        $this->db->select('angkatan');
+        $this->db->where('role', 'mahasiswa');
+        $this->db->where('angkatan IS NOT NULL');
+        $this->db->where('is_active', 1);
+        $this->db->group_by('angkatan');
+        $this->db->order_by('angkatan', 'DESC');
+        return $this->db->get($this->table)->result();
+    }
 }

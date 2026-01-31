@@ -81,59 +81,6 @@ class Matkum_model extends CI_Model
     }
 
     /**
-     * Get mata kuliah for a semester
-     */
-    public function get_by_semester($semester_id)
-    {
-        $this->db->select('mata_kuliah.*');
-        $this->db->from($this->table);
-        $this->db->join('semester_matkum', 'semester_matkum.id_matkul = mata_kuliah.id');
-        $this->db->where('semester_matkum.id_semester', $semester_id);
-        $this->db->where('mata_kuliah.is_active', 1);
-        $this->db->order_by('mata_kuliah.kode_matkul', 'ASC');
-        return $this->db->get()->result();
-    }
-
-    /**
-     * Assign matkum to semester
-     */
-    public function assign_to_semester($matkul_id, $semester_id)
-    {
-        // Check if already assigned
-        $this->db->where('id_matkul', $matkul_id);
-        $this->db->where('id_semester', $semester_id);
-        if ($this->db->count_all_results('semester_matkum') > 0) {
-            return true; // Already assigned
-        }
-
-        $data = array(
-            'id_matkul' => $matkul_id,
-            'id_semester' => $semester_id
-        );
-        return $this->db->insert('semester_matkum', $data);
-    }
-
-    /**
-     * Remove matkum from semester
-     */
-    public function remove_from_semester($matkul_id, $semester_id)
-    {
-        $this->db->where('id_matkul', $matkul_id);
-        $this->db->where('id_semester', $semester_id);
-        return $this->db->delete('semester_matkum');
-    }
-
-    /**
-     * Check if matkum is in semester
-     */
-    public function is_in_semester($matkul_id, $semester_id)
-    {
-        $this->db->where('id_matkul', $matkul_id);
-        $this->db->where('id_semester', $semester_id);
-        return $this->db->count_all_results('semester_matkum') > 0;
-    }
-
-    /**
      * Count total mata kuliah
      */
     public function count_all()

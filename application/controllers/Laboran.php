@@ -7,7 +7,7 @@ class Laboran extends Laboran_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Matkum_model', 'Modul_model', 'Semester_model', 'Rps_model', 'Referensi_model'));
+        $this->load->model(array('Matkum_model', 'Modul_model', 'Rps_model', 'Referensi_model'));
     }
 
     /**
@@ -21,8 +21,7 @@ class Laboran extends Laboran_Controller
         $data = array(
             'title' => 'Dashboard Laboran',
             'page_title' => 'Mata Praktikum Saya',
-            'my_matkum' => $my_matkum,
-            'current_semester' => $this->Semester_model->get_latest()
+            'my_matkum' => $my_matkum
         );
 
         $this->load_view('laboran/index', $data);
@@ -251,6 +250,143 @@ class Laboran extends Laboran_Controller
         );
 
         $this->load_view('laboran/edit_modul', $data);
+    }
+
+    /**
+     * Edit RPS
+     */
+    public function edit_rps($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+        $rps = $this->Rps_model->get_by_id($id);
+
+        if (!$rps) {
+            $this->session->set_flashdata('error', 'RPS tidak ditemukan');
+            redirect('laboran');
+        }
+
+        // Verify access
+        if (!$this->Matkum_model->is_laboran_assigned($rps->id_matkul, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses');
+            redirect('laboran');
+        }
+
+        if ($this->input->post()) {
+            $rps_data = array(
+                'judul' => $this->input->post('judul', TRUE)
+            );
+
+            // Handle file upload if new file provided
+            if (!empty($_FILES['file']['name'])) {
+                $upload = $this->do_upload('file', 'rps');
+                if ($upload['success']) {
+                    // Delete old file
+                    if ($rps->file_path) {
+                        $old_file = FCPATH . 'uploads/rps/' . $rps->file_path;
+                        if (file_exists($old_file)) {
+                            unlink($old_file);
+                        }
+                    }
+                    $rps_data['file_path'] = $upload['file_name'];
+                } else {
+                    $this->session->set_flashdata('error', $upload['error']);
+                    redirect('laboran/edit_rps/' . $id);
+                }
+            }
+
+            $this->Rps_model->update($id, $rps_data);
+            $this->log_activity('update_rps', 'Updated RPS: ' . $rps_data['judul']);
+            $this->session->set_flashdata('success', 'RPS berhasil diperbarui');
+            redirect('laboran/matkum/' . $rps->id_matkul);
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($rps->id_matkul);
+
+        $data = array(
+            'title' => 'Edit RPS',
+            'page_title' => 'Edit RPS',
+            'rps' => $rps,
+            'matkum' => $matkum
+        );
+
+        $this->load_view('laboran/edit_rps', $data);
+    }
+
+    /**
+     * Edit Referensi
+     */
+    public function edit_referensi($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+        $referensi = $this->Referensi_model->get_by_id($id);
+
+        if (!$referensi) {
+            $this->session->set_flashdata('error', 'Referensi tidak ditemukan');
+            redirect('laboran');
+        }
+
+        // Verify access
+        if (!$this->Matkum_model->is_laboran_assigned($referensi->id_matkul, $user_id)) {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki akses');
+            redirect('laboran');
+        }
+
+        if ($this->input->post()) {
+            $tipe = $this->input->post('tipe');
+            $referensi_data = array(
+                'judul' => $this->input->post('judul', TRUE),
+                'deskripsi' => $this->input->post('deskripsi', TRUE),
+                'tipe' => $tipe
+            );
+
+            if ($tipe == 'file') {
+                // Handle file upload if new file provided
+                if (!empty($_FILES['file']['name'])) {
+                    $upload = $this->do_upload('file', 'referensi');
+                    if ($upload['success']) {
+                        // Delete old file if exists
+                        if ($referensi->file_path) {
+                            $old_file = FCPATH . 'uploads/referensi/' . $referensi->file_path;
+                            if (file_exists($old_file)) {
+                                unlink($old_file);
+                            }
+                        }
+                        $referensi_data['file_path'] = $upload['file_name'];
+                    } else {
+                        $this->session->set_flashdata('error', $upload['error']);
+                        redirect('laboran/edit_referensi/' . $id);
+                    }
+                }
+                $referensi_data['link_external'] = null;
+            } else {
+                // Link type
+                $referensi_data['link_external'] = $this->input->post('link_external', TRUE);
+                // Delete old file if switching from file to link
+                if ($referensi->file_path) {
+                    $old_file = FCPATH . 'uploads/referensi/' . $referensi->file_path;
+                    if (file_exists($old_file)) {
+                        unlink($old_file);
+                    }
+                }
+                $referensi_data['file_path'] = null;
+            }
+
+            $this->Referensi_model->update($id, $referensi_data);
+            $this->log_activity('update_referensi', 'Updated Referensi: ' . $referensi_data['judul']);
+            $this->session->set_flashdata('success', 'Referensi berhasil diperbarui');
+            redirect('laboran/matkum/' . $referensi->id_matkul);
+        }
+
+        $matkum = $this->Matkum_model->get_by_id($referensi->id_matkul);
+
+        $data = array(
+            'title' => 'Edit Referensi',
+            'page_title' => 'Edit Referensi',
+            'referensi' => $referensi,
+            'matkum' => $matkum
+        );
+
+        $this->load_view('laboran/edit_referensi', $data);
     }
 
     /**

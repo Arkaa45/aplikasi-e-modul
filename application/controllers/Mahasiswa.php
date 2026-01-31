@@ -7,7 +7,7 @@ class Mahasiswa extends Mahasiswa_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Matkum_model', 'Modul_model', 'Semester_model', 'Rps_model', 'Referensi_model'));
+        $this->load->model(array('Matkum_model', 'Modul_model', 'Rps_model', 'Referensi_model'));
     }
 
     /**

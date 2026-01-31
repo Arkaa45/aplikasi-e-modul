@@ -1,11 +1,7 @@
 <!-- Page Header -->
 <div class="mb-6">
     <h1 class="text-xl font-medium text-gray-800">Dashboard Laboran</h1>
-    <p class="text-sm text-gray-500">
-        <?php if (isset($current_semester) && $current_semester): ?>
-            Semester: <?= $current_semester->nama_semester ?>     <?= $current_semester->tahun_ajaran ?>
-        <?php endif; ?>
-    </p>
+    <p class="text-sm text-gray-500">Selamat datang di panel laboran E-Modul Praktikum</p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

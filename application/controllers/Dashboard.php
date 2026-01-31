@@ -8,7 +8,7 @@ class Dashboard extends MY_Controller
     {
         parent::__construct();
         $this->require_login();
-        $this->load->model(array('User_model', 'Semester_model', 'Matkum_model', 'Modul_model'));
+        $this->load->model(array('User_model', 'Matkum_model', 'Modul_model'));
     }
 
     /**
@@ -38,8 +38,6 @@ class Dashboard extends MY_Controller
      */
     private function admin_dashboard()
     {
-        $current_semester = $this->Semester_model->get_latest();
-
         $data = array(
             'title' => 'Dashboard Admin',
             'page_title' => 'Dashboard',
@@ -48,9 +46,6 @@ class Dashboard extends MY_Controller
             'total_laboran' => $this->User_model->count_by_role('laboran'),
             'total_matkum' => $this->Matkum_model->count_all(),
             'total_modul' => $this->Modul_model->count_all(),
-            'current_semester' => $current_semester,
-            'semester_matkum_count' => $current_semester ? $this->Semester_model->count_matkum($current_semester->id) : 0,
-            'semester_mahasiswa_count' => $current_semester ? $this->Semester_model->count_mahasiswa($current_semester->id) : 0,
             'recent_moduls' => $this->Modul_model->get_recent(5)
         );
 
@@ -68,8 +63,7 @@ class Dashboard extends MY_Controller
             'title' => 'Dashboard Laboran',
             'page_title' => 'Dashboard',
             'my_matkum' => $this->Matkum_model->get_by_laboran($user_id),
-            'my_moduls' => $this->Modul_model->get_by_uploader($user_id, 10),
-            'current_semester' => $this->Semester_model->get_latest()
+            'my_moduls' => $this->Modul_model->get_by_uploader($user_id, 10)
         );
 
         $this->load_view('dashboard/laboran', $data);

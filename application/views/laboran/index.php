@@ -6,14 +6,6 @@
     <p class="text-sm text-gray-500">Kelola konten mata praktikum yang ditugaskan kepada Anda</p>
 </div>
 
-<?php if (isset($current_semester) && $current_semester): ?>
-    <div class="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-brown-100 text-brown-700 rounded-full text-sm">
-        <span class="material-icons-outlined text-lg">calendar_today</span>
-        <?= $current_semester->nama_semester ?>
-        <?= $current_semester->tahun_ajaran ?>
-    </div>
-<?php endif; ?>
-
 <!-- Mata Praktikum Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <?php if (!empty($my_matkum)): ?>

@@ -29,11 +29,6 @@
                     <span class="material-icons-outlined text-xl">people</span>
                     Kelola User
                 </a>
-                <a href="<?= base_url('admin/semester') ?>"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'admin/semester') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
-                    <span class="material-icons-outlined text-xl">calendar_month</span>
-                    Kelola Semester
-                </a>
                 <a href="<?= base_url('admin/matkum') ?>"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-full text-sm font-medium <?= strpos($current_url, 'admin/matkum') !== false ? 'bg-brown-100 text-brown-700' : 'text-gray-700 hover:bg-gray-100' ?>">
                     <span class="material-icons-outlined text-xl">menu_book</span>

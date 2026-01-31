@@ -76,7 +76,7 @@ class Auth extends CI_Controller
     /**
      * Logout
      */
-    public function logout()
+    public function logout() 
     {
         // Log activity before destroying session
         if ($this->session->userdata('user_id')) {
